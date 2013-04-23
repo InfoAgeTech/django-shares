@@ -4,7 +4,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django_tools.models import AbstractBaseModel
-import datetime
+from datetime import datetime
 
 User = get_user_model()
 
@@ -33,10 +33,10 @@ class SharePending(AbstractBaseModel):
     email = models.EmailField()
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    last_sent = models.DateTimeField(default=datetime.datetime.utcnow)
-#    for_user = models.ForeignKey(User, blank=True, null=True)
+    last_sent = models.DateTimeField(default=datetime.utcnow)
+    for_user = models.ForeignKey(User, blank=True, null=True)
     message = models.TextField()
-    token = models.CharField()
+    token = models.CharField(max_length=50)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -67,9 +67,14 @@ class Share(AbstractBaseModel):
     #       things like amount, percent share, etc on a SomeObjectShareMeta models which
     #       is what the generic key would reference.
     #
+    #       DON'T do the above! What will happen behind the scenes is a join. If
+    #       that's the case then i would be smarter to just create this as a model
+    #       and extend it will another model (neither would be ebstract).
+    #
     # Or just create a separate model for SomeObjectShare and make this model abstract?
     #
-    # See third option for a JSONField above (can't query off it's values)
+    # If this model is abstract, then I shouldn't need a generic foreign key below
+    # I should just add the actual foreign key this object is for.
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
