@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django_sharing.constants import Status
 from django_sharing.managers import ShareManager
 from django_tools.models import AbstractBaseModel
 from python_tools.random_utils import random_alphanum_id
-# from django.contrib.contenttypes import generic
-# from django.contrib.contenttypes.models import ContentType
-# from django_sharing.managers import SharePendingManager
 
 User = get_user_model()
 
 
-class AbstractShare(AbstractBaseModel):
+class Share(AbstractBaseModel):
     """Base share object represents an embedded document of information for a 
     specific user sharing a document.
     
@@ -30,7 +29,7 @@ class AbstractShare(AbstractBaseModel):
     * token: pending share token key. 
     
     """
-    for_user = models.ForeignKey(User, blank=True, null=True)
+    for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
     # START for pending shares
     email = models.EmailField()
     first_name = models.CharField(max_length=100)
@@ -40,7 +39,7 @@ class AbstractShare(AbstractBaseModel):
     # END for pending shares... create a separata object for this?
     token = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=25, choices=Status.CHOICES)
-    objects = ShareManager()
+
     # TODO: Could use a second generic foreign key here to represent the metadata
     #       for whatever type of share it was.  So, it's a bill share I would have
     #       things like amount, percent share, etc on a SomeObjectShareMeta models which
@@ -58,19 +57,20 @@ class AbstractShare(AbstractBaseModel):
     # If I do a generic foreign key I could do proxy models that references this
     # model. However, that still doesn't resolve needing extra fields.
     #
-#    content_type = models.ForeignKey(ContentType)
-#    object_id = models.PositiveIntegerField()
-#    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    objects = ShareManager()
 
     class Meta:
-        abstract = True
+        ordering = ['-created_dttm']
 
     def save(self, *args, **kwargs):
 
         if not self.token:
             self.token = random_alphanum_id(id_len=25)
 
-        return super(AbstractShare, self).save(*args, **kwargs)
+        return super(Share, self).save(*args, **kwargs)
 
     @classmethod
     def add_for_user(cls, user, status=Status.PENDING, **kwargs):

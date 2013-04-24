@@ -25,7 +25,7 @@ setup(
     test_suite='nose.collector',
     tests_require=['nose'],
     setup_requires=[
-        'mongoengine >= 0.7.9',
+        'django >= 1.5.1',
         'django-nose >= 1.1'
     ],
     classifiers=classifiers

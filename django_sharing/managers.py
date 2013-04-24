@@ -14,7 +14,7 @@ from django.db import models
 #        return self.filter(for_user_id=user_id)
 
 
-class ShareManager(models.manager):
+class ShareManager(models.Manager):
     """Manager for sharing objects."""
 
     def get_for_user(self, user):
@@ -34,16 +34,15 @@ class ShareManager(models.manager):
             return self.get(token=token)
         except self.model.DoesNotExist:
             return None
-#
-# class SharePendingManager(CommonShareManager):
-#    """Manager for pending share object."""
-#
-#    def get_by_email(self, email):
-#        return self.filter(email=email)
-#
-#    def get_by_token(self, token):
-#        """Gets a pending share by token."""
-#        try:
-#            return self.get(token=token)
-#        except self.model.DoesNotExist:
-#            return None
+
+    def get_by_content_object(self, obj):
+        """Gets all shares for an object.
+        
+        :param obj: object to get shares for.
+        """
+        # I don't actually think I can do this. Might instead have to do:
+        # content_type = ContentType.objects.get_for_model(obj)
+        # return self.filter(content_type=content_type, object_id=obj.id)
+        # or
+        # return self.filter(content_type__pk=content_type.id, object_id=obj.id)
+        return self.filter(content_object=obj)

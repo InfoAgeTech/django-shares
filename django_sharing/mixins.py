@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from django.db import models
-from django_sharing.models import SharePending
+# from django_sharing.models import SharePending
 from django.contrib.contenttypes import generic
 from django_sharing.models import Share
+# from django_sharing.models import Share
 
 # class SimpleDocShareMixin(object):
 #    """Sharing mixing for a document.
@@ -138,7 +139,7 @@ class ShareMixin(models.Model):
         else:
             self.shares.append(share)
 
-        super(ShareModelMixin, self).add_share(for_user_id=for_user_id,
+        super(ShareMixin, self).add_share(for_user_id=for_user_id,
                                              additional_updates=additional_updates,
                                              auto_save=auto_save)
 
@@ -198,7 +199,7 @@ class ShareMixin(models.Model):
         else:
             self.shares = shares
 
-        super(ShareModelMixin, self).remove_shares(for_user_ids=for_user_ids,
+        super(ShareMixin, self).remove_shares(for_user_ids=for_user_ids,
                                                  additional_updates=additional_updates,
                                                  auto_save=auto_save)
 
@@ -235,7 +236,7 @@ class SharePendingMixin(models.Model):
 #                               db_field='ps')
 
 #    pending_shares = models.ForeignKey(SharePending, null=True, blank=True)
-    pending_shares = generic.GenericRelation(SharePending)
+    pending_shares = generic.GenericRelation(Share)
 
     class Meta:
         abstract = True
