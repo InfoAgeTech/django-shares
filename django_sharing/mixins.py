@@ -93,7 +93,7 @@ from django_sharing.models import Share
 #                                   if uid not in for_user_ids]
 
 
-class ShareModelMixin(models.Model):
+class ShareMixin(models.Model):
     """Document Sharing mixing that adds a shares list field which stores 
     additional metadata about a users share.
     
@@ -105,7 +105,7 @@ class ShareModelMixin(models.Model):
 #    meta = {'share_embedded_document': BaseShareEmbeddedDocument}
 #    shares = ListField(EmbeddedDocumentField(meta['share_embedded_document']),
 #                       db_field='sh')
-    shares = generic.GenericRelation(Share)
+#    shares = generic.GenericRelation(Share)
 
     class Meta:
         abstract = True
