@@ -17,7 +17,7 @@ class Share(AbstractBaseModel):
     specific user sharing a document.
     
     Fields:
-    
+    * for_user: the user the object is shared with.
     * email: email of the user who the share was sent to if user is unknown.
     * first_name: first name of the person invited
     * last_name: last name of the person invited
@@ -26,44 +26,32 @@ class Share(AbstractBaseModel):
     * for_user_id: user_id the pending share is for (optional since they might  
         not be an actual user yet).
     * message: message sent to user in email.
+    * content_type: the content type of the generic shared object
+    * object_id: the object id of the shared object
+    * shared_object: the object being shared.
     * token: pending share token key. 
     
     """
     for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
-    # START for pending shares
-    email = models.EmailField()
+    email = models.EmailField(db_index=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     last_sent = models.DateTimeField(default=datetime.utcnow)
-    message = models.TextField()
-    # END for pending shares... create a separata object for this?
-    token = models.CharField(max_length=50, unique=True)
+    message = models.TextField(blank=True, null=True)
+    token = models.CharField(max_length=50, db_index=True, unique=True)
     status = models.CharField(max_length=25, choices=Status.CHOICES)
-
-    # TODO: Could use a second generic foreign key here to represent the metadata
-    #       for whatever type of share it was.  So, it's a bill share I would have
-    #       things like amount, percent share, etc on a SomeObjectShareMeta models which
-    #       is what the generic key would reference.
-    #
-    #       DON'T do the above! What will happen behind the scenes is a join. If
-    #       that's the case then i would be smarter to just create this as a model
-    #       and extend it will another model (neither would be ebstract).
-    #
-    # Or just create a separate model for SomeObjectShare and make this model abstract?
-    #
-    # If this model is abstract, then I shouldn't need a generic foreign key below
-    # I should just add the actual foreign key this object is for.
-    #
-    # If I do a generic foreign key I could do proxy models that references this
-    # model. However, that still doesn't resolve needing extra fields.
-    #
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    shared_object = generic.GenericForeignKey('content_type', 'object_id')
     objects = ShareManager()
 
     class Meta:
         ordering = ['-created_dttm']
+        # Make sure you can only have 1 share per user per shared_object
+        unique_together = ('content_type', 'object_id', 'for_user',)
+        index_together = [
+            ['content_type', 'object_id'],
+        ]
 
     def save(self, *args, **kwargs):
 
@@ -73,19 +61,45 @@ class Share(AbstractBaseModel):
         return super(Share, self).save(*args, **kwargs)
 
     @classmethod
-    def add_for_user(cls, user, status=Status.PENDING, **kwargs):
-        """Adds a share for an existing user."""
-        share = cls(for_user=user, **kwargs)
+    def add_for_user(cls, created_by_user, for_user, shared_object,
+                     status=Status.PENDING, **kwargs):
+        """Adds a share for an existing user.
+        
+        :param created_by_user: the user creating the share.
+        :param for_user: the user the shared object is being shared with.
+        :param shared_object: the object being shared.
+        :param status: the status of the shared object.
+        :param kwargs: can be any keyword args on the sharing model.
+        """
+        share = cls(created=created_by_user,
+                    last_modified=created_by_user,
+                    for_user=for_user,
+                    shared_object=shared_object,
+                    status=status,
+                    **kwargs)
         share.save()
         return share
 
     @classmethod
-    def add_for_non_user(cls, email, first_name, last_name, message=None,
-                         status=Status.PENDING, **kwargs):
+    def add_for_non_user(cls, created_by_user, shared_object, email, first_name,
+                         last_name, message=None, status=Status.PENDING,
+                         **kwargs):
         """Adds a share for a user who potentially isn't a member of the site
         yet.
+        
+        :param created_by_user: the user creating the share.
+        :param shared_object: the object being shared.
+        :param email: email of the person being shared with.
+        :param first_name: first name of the person being shared with.
+        :param last_name: last name of the person being shared with.
+        :param message: message to the user being shared with
+        :param status: the status of the shared object. Since this user isn't
+            necessarily a site user yet.
         """
-        share = cls(email=email,
+        share = cls(created=created_by_user,
+                    last_modified=created_by_user,
+                    shared_object=shared_object,
+                    email=email,
                     first_name=first_name,
                     last_name=last_name,
                     message=message,
@@ -93,50 +107,3 @@ class Share(AbstractBaseModel):
                     **kwargs)
         share.save()
         return share
-
-
-# class AbstractSharePending(AbstractBaseModel):
-#    """This is the base model used for pending requests.
-#
-#    When first created, the id and the token will be the same.  These are two
-#    separate fields because the id should never change.  The token could get
-#    reassigned if it expires or a new token needs to be generated at a later
-#    time.
-#
-#    Fields:
-#
-#    * email: email of the user who the share was sent to if uid is unknown.
-#    * first_name: first name of the person invited
-#    * last_name: last name of the person invited
-#    * last_sent: date time the share was last sent.
-#    * created_id: the id of the user who sent the pending share
-#    * for_user_id: user_id the pending share is for (optional since they might
-#        not be an actual user yet).
-#    * message: message sent to user in email.
-#    * token: pending share token key.
-#
-#    """
-#    email = models.EmailField()
-#    first_name = models.CharField(max_length=100)
-#    last_name = models.CharField(max_length=100)
-#    last_sent = models.DateTimeField(default=datetime.utcnow)
-#    for_user = models.ForeignKey(User, blank=True, null=True)
-#    message = models.TextField()
-#    token = models.CharField(max_length=50, unique=True)
-#    objects = SharePendingManager()
-# #    content_type = models.ForeignKey(ContentType)
-# #    object_id = models.PositiveIntegerField()
-# #    content_object = generic.GenericForeignKey('content_type', 'object_id')
-#
-#    # TODO: could add a JSONField here and allow this model to be extended
-#    #       and add additional properties to that field.  Then new fields would
-#    #       be accessed via
-#    #
-#    # _sharing_metadata = JSONField()
-#    #
-#    # @property
-#    # def some_attribute_name(self):
-#    #    self._sharing_metadata.get('some_attr_name')
-#
-#    class Meta:
-#        abstract = True

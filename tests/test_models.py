@@ -1,43 +1,21 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+import uuid
 
 from django.test import TestCase
-from django.test.client import Client
 from django.contrib.auth import get_user_model
-from tests.models import Car
+
+from django_sharing.models import Share
+from django_sharing.constants import Status
 
 User = get_user_model()
 
+def random_string():
+    return uuid.uuid4().hex[:8]
 
-# class MockShareEmbeddedDocument(BaseShareEmbeddedDocument):
-#    """Mock embedded sharing object to properly test inheritance."""
-#    some_attribute = StringField(db_field='sa')
-#
-#
-# class MockDocSharesMixinModel(AbstractBaseDocument, DocShareMixin):
-#    """Mock model used for testing the base shares model mixin."""
-#    meta = {'share_embedded_document': MockShareEmbeddedDocument}
-#
-#
-# class MockSimpleDocSharesMixinModel(AbstractBaseDocument, SimpleDocShareMixin):
-#    """Mock model used for testing the base shares model mixin."""
-#    pass
-#
-#
-# class MockBasePendingSharesMixinModel(AbstractBaseDocument, BasePendingSharesMixin):
-#    """Mock model used for testing the base pending shares model mixin."""
-#    pass
-#
-#
-# class MockSharePendingEmbeddedDocument(BaseSharePendingEmbeddedDocument):
-#    """Mock share pending embedded document that has an extra field."""
-#    my_extra_share_attr = StringField(db_field='mesa')
-#
-#
-# class MockPendingSharesCustomShareMixin(AbstractBaseDocument, BasePendingSharesMixin):
-#    """Mock model for pending shares using a different share embedded object."""
-#    meta = {'pending_share_embedded_document': MockSharePendingEmbeddedDocument}
-
+def random_user():
+    random_username = random_string()
+    random_email = '{0}@{1}.com'.format(random_string(), random_string())
+    return User.objects.create_user(random_username, random_email)
 
 class ShareTests(TestCase):
 
@@ -45,18 +23,93 @@ class ShareTests(TestCase):
     def setUpClass(cls):
         """Run once per test case"""
         super(ShareTests, cls).setUpClass()
-        cls.usr = User.objects.create_user('john', 'john@doe.com', 'test')
+        cls.user = random_user()
 
     def setUp(self):
         """Run once per test."""
-#        self.car = Car.objects.create()
+        self.shared_user = random_user()
 
     def test_add_for_user(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        shared_user = User.objects.create_user('Bill', 'bill@bow.com', 'pass')
-        self.assertIsNone(self.usr)
-        pass
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        self.assertEqual(share.shared_object, self.shared_user)
+
+    def test_add_for_non_user(self):
+        """Share a user object with a another user."""
+        first_name = 'Jimmy'
+        last_name = 'Buffet'
+        email = 'hello@world.com'
+        message = 'Share with me.'
+        status = Status.PENDING
+        share = Share.add_for_non_user(created_by_user=self.user,
+                                       shared_object=self.shared_user,
+                                       first_name=first_name,
+                                       last_name=last_name,
+                                       email=email,
+                                       message=message,
+                                       status=status)
+        self.assertEqual(share.first_name, first_name)
+        self.assertEqual(share.last_name, last_name)
+        self.assertEqual(share.email, email)
+        self.assertEqual(share.status, status)
+        self.assertEqual(share.message, message)
+
+    def test_get_for_user(self):
+        """Share a user object with a another user."""
+        # self.assertEqual(self.car.shares, [])
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        shares = Share.objects.get_for_user(user=self.user)
+
+        self.assertEqual(len(shares), 1)
+        self.assertEqual(shares[0], share)
+
+    def test_get_for_user_id(self):
+        """Share a user object with a another user."""
+        # self.assertEqual(self.car.shares, [])
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        shares = Share.objects.get_for_user_id(user_id=self.user.id)
+
+        self.assertEqual(len(shares), 1)
+        self.assertEqual(shares[0], share)
+
+    def test_get_email(self):
+        """Share a user object with a another user."""
+        # self.assertEqual(self.car.shares, [])
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        shares = Share.objects.get_by_email(email=self.user.email)
+
+        self.assertEqual(len(shares), 1)
+        self.assertEqual(shares[0], share)
+
+    def test_get_by_token(self):
+        """Share a user object with a another user."""
+        # self.assertEqual(self.car.shares, [])
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        share_db = Share.objects.get_by_token(token=share.token)
+
+        self.assertEqual(share, share_db)
+
+    def test_get_by_shared_object(self):
+        """Share a user object with a another user."""
+        # self.assertEqual(self.car.shares, [])
+        share = Share.add_for_user(created_by_user=self.user,
+                                   for_user=self.user,
+                                   shared_object=self.shared_user)
+        shares = Share.objects.get_by_shared_object(obj=self.shared_user)
+
+        self.assertEqual(len(shares), 1)
+        self.assertEqual(shares[0], share)
 
 #    def test_add_share(self):
 #        """Test for adding a share to a document."""
