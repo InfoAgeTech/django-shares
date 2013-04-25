@@ -1,0 +1,1 @@
+Search.setIndex({envversion:42,terms:{index:0,modul:0,search:0,page:0,complet:0},objtypes:{},objnames:{},filenames:["index","apireference"],titles:["Welcome to django-sharing&#8217;s documentation!","API Reference"],objects:{},titleterms:{welcom:0,share:0,indic:0,django:0,api:1,tabl:0,model:1,document:0,refer:1}})
