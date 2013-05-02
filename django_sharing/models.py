@@ -6,7 +6,6 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django_tools.models import AbstractBaseModel
-from python_tools.random_utils import random_alphanum_id
 
 from .constants import Status
 from .managers import ShareManager
@@ -31,7 +30,7 @@ class Share(AbstractBaseModel):
     * content_type: the content type of the generic shared object
     * object_id: the object id of the shared object
     * shared_object: the object being shared.
-    * token: pending share token key. 
+    * token: share token. 
     
     """
     for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
@@ -58,6 +57,6 @@ class Share(AbstractBaseModel):
     def save(self, *args, **kwargs):
 
         if not self.token:
-            self.token = random_alphanum_id(id_len=25)
+            self.token = self.__class__.objects.get_next_token()
 
         return super(Share, self).save(*args, **kwargs)

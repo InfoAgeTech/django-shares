@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
 from django.db.models.query_utils import Q
+from django_tools.managers import TokenManager
 
 from .constants import Status
 
 
-class ShareManager(models.Manager):
+class ShareManager(TokenManager):
     """Manager for sharing objects."""
 
     def create_for_user(self, created_by_user, for_user, shared_object,
@@ -61,14 +61,8 @@ class ShareManager(models.Manager):
 
     def get_by_email(self, email):
         """Gets shares by an email."""
+        # TODO: To lower()?
         return self.filter(Q(email=email) | Q(for_user__email=email))
-
-    def get_by_token(self, token):
-        """Gets a pending share by token."""
-        try:
-            return self.get(token=token)
-        except self.model.DoesNotExist:
-            return None
 
     def get_by_shared_object(self, obj):
         """Gets all shares for an object.
