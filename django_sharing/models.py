@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django_sharing.constants import Status
-from django_sharing.managers import ShareManager
 from django_tools.models import AbstractBaseModel
 from python_tools.random_utils import random_alphanum_id
+
+from .constants import Status
+from .managers import ShareManager
 
 User = get_user_model()
 
@@ -59,51 +61,3 @@ class Share(AbstractBaseModel):
             self.token = random_alphanum_id(id_len=25)
 
         return super(Share, self).save(*args, **kwargs)
-
-    @classmethod
-    def add_for_user(cls, created_by_user, for_user, shared_object,
-                     status=Status.PENDING, **kwargs):
-        """Adds a share for an existing user.
-        
-        :param created_by_user: the user creating the share.
-        :param for_user: the user the shared object is being shared with.
-        :param shared_object: the object being shared.
-        :param status: the status of the shared object.
-        :param kwargs: can be any keyword args on the sharing model.
-        """
-        share = cls(created=created_by_user,
-                    last_modified=created_by_user,
-                    for_user=for_user,
-                    shared_object=shared_object,
-                    status=status,
-                    **kwargs)
-        share.save()
-        return share
-
-    @classmethod
-    def add_for_non_user(cls, created_by_user, shared_object, email, first_name,
-                         last_name, message=None, status=Status.PENDING,
-                         **kwargs):
-        """Adds a share for a user who potentially isn't a member of the site
-        yet.
-        
-        :param created_by_user: the user creating the share.
-        :param shared_object: the object being shared.
-        :param email: email of the person being shared with.
-        :param first_name: first name of the person being shared with.
-        :param last_name: last name of the person being shared with.
-        :param message: message to the user being shared with
-        :param status: the status of the shared object. Since this user isn't
-            necessarily a site user yet.
-        """
-        share = cls(created=created_by_user,
-                    last_modified=created_by_user,
-                    shared_object=shared_object,
-                    email=email,
-                    first_name=first_name,
-                    last_name=last_name,
-                    message=message,
-                    status=status,
-                    **kwargs)
-        share.save()
-        return share

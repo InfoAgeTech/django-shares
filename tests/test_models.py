@@ -32,9 +32,9 @@ class ShareTests(TestCase):
     def test_add_for_user(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         self.assertEqual(share.shared_object, self.shared_user)
 
     def test_add_for_non_user(self):
@@ -44,13 +44,13 @@ class ShareTests(TestCase):
         email = 'hello@world.com'
         message = 'Share with me.'
         status = Status.PENDING
-        share = Share.add_for_non_user(created_by_user=self.user,
-                                       shared_object=self.shared_user,
-                                       first_name=first_name,
-                                       last_name=last_name,
-                                       email=email,
-                                       message=message,
-                                       status=status)
+        share = Share.objects.create_for_non_user(created_by_user=self.user,
+                                                  shared_object=self.shared_user,
+                                                  first_name=first_name,
+                                                  last_name=last_name,
+                                                  email=email,
+                                                  message=message,
+                                                  status=status)
         self.assertEqual(share.first_name, first_name)
         self.assertEqual(share.last_name, last_name)
         self.assertEqual(share.email, email)
@@ -60,9 +60,9 @@ class ShareTests(TestCase):
     def test_get_for_user(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         shares = Share.objects.get_for_user(user=self.user)
 
         self.assertEqual(len(shares), 1)
@@ -71,9 +71,9 @@ class ShareTests(TestCase):
     def test_get_for_user_id(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         shares = Share.objects.get_for_user_id(user_id=self.user.id)
 
         self.assertEqual(len(shares), 1)
@@ -82,9 +82,9 @@ class ShareTests(TestCase):
     def test_get_email(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         shares = Share.objects.get_by_email(email=self.user.email)
 
         self.assertEqual(len(shares), 1)
@@ -93,9 +93,9 @@ class ShareTests(TestCase):
     def test_get_by_token(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         share_db = Share.objects.get_by_token(token=share.token)
 
         self.assertEqual(share, share_db)
@@ -103,9 +103,9 @@ class ShareTests(TestCase):
     def test_get_by_shared_object(self):
         """Share a user object with a another user."""
         # self.assertEqual(self.car.shares, [])
-        share = Share.add_for_user(created_by_user=self.user,
-                                   for_user=self.user,
-                                   shared_object=self.shared_user)
+        share = Share.objects.create_for_user(created_by_user=self.user,
+                                              for_user=self.user,
+                                              shared_object=self.shared_user)
         shares = Share.objects.get_by_shared_object(obj=self.shared_user)
 
         self.assertEqual(len(shares), 1)
