@@ -60,3 +60,29 @@ class Share(AbstractBaseModel):
             self.token = self.__class__.objects.get_next_token()
 
         return super(Share, self).save(*args, **kwargs)
+
+    def accept(self, **kwargs):
+        """Accept a share by updating the status to accepted.
+        
+        :param kwargs: additional fields that needs to be updated when the 
+            field is accepted.
+        """
+        self.status = Status.ACCEPTED
+
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+
+        return self.save()
+
+    def decline(self, **kwargs):
+        """Accept a share by updating the status to accepted.
+        
+        :param kwargs: additional fields that needs to be updated when the 
+            field is accepted.
+        """
+        self.status = Status.DECLINED
+
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+
+        return self.save()
