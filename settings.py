@@ -24,8 +24,8 @@ USE_I18N = True
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
-#    'django.contrib.sessions',
     'django_sharing',
+    'django_tools',
     'django_nose',
 )
 
