@@ -1,5 +1,18 @@
+NOTE: This is not stable yet and will likely change!  Please don't use in production until the 1.0 release.
+
+==============
 django-sharing
 ==============
+:Info: django-recurrence is a python recurrence module written for django.
+:Repository: https://github.com/InfoAgeTech/django-sharing
+:Author: Troy Grosfield (http://github.com/troygrosfield)
+:Maintainer: Troy Grosfield (http://github.com/troygrosfield)
+
+.. image:: https://travis-ci.org/InfoAgeTech/django-sharing.png?branch=master
+  :target: http://travis-ci.org/InfoAgeTech/django-sharing
+
+About
+=====
 
 Handles object sharing in django.  Don't clone.  Not stable.
 
