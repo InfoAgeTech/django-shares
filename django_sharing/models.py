@@ -6,6 +6,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django_tools.models import AbstractBaseModel
+from python_tools.list_utils import make_obj_list
 
 from .constants import Status
 from .managers import ShareManager
@@ -49,12 +50,18 @@ class AbstractShare(AbstractBaseModel):
     class Meta:
         abstract = True
 
-    def save(self, *args, **kwargs):
+    @classmethod
+    def save_prep(cls, instance_or_instances):
+        """Preprocess the object before the object is saved.  This automatically 
+        gets called when the save method gets called.
+        """
+        instances = make_obj_list(instance_or_instances)
 
-        if not self.token:
-            self.token = self.__class__.objects.get_next_token()
+        for instance in instances:
+            if not instance.token:
+                instance.token = instance.__class__.objects.get_next_token()
 
-        return super(AbstractShare, self).save(*args, **kwargs)
+        return super(AbstractShare, cls).save_prep(instance_or_instances=instances)
 
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.
