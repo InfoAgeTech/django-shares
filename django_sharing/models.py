@@ -13,9 +13,9 @@ from .managers import ShareManager
 User = get_user_model()
 
 
-class Share(AbstractBaseModel):
-    """Base share object represents an embedded document of information for a 
-    specific user sharing a document.
+class AbstractShare(AbstractBaseModel):
+    """Abstract Base share object represents basic shared information for a 
+    specific user sharing an object.
     
     Fields:
     * for_user: the user the object is shared with.
@@ -47,19 +47,14 @@ class Share(AbstractBaseModel):
     objects = ShareManager()
 
     class Meta:
-        ordering = ['-created_dttm']
-        # Make sure you can only have 1 share per user per shared_object
-        unique_together = ('content_type', 'object_id', 'for_user',)
-        index_together = [
-            ['content_type', 'object_id'],
-        ]
+        abstract = True
 
     def save(self, *args, **kwargs):
 
         if not self.token:
             self.token = self.__class__.objects.get_next_token()
 
-        return super(Share, self).save(*args, **kwargs)
+        return super(AbstractShare, self).save(*args, **kwargs)
 
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.
@@ -86,3 +81,15 @@ class Share(AbstractBaseModel):
             setattr(self, attr, value)
 
         return self.save()
+
+
+class Share(AbstractShare):
+    """The implementation for a shared object."""
+
+    class Meta:
+        ordering = ['-created_dttm']
+        # Make sure you can only have 1 share per user per shared_object
+        unique_together = ('content_type', 'object_id', 'for_user',)
+        index_together = [
+            ['content_type', 'object_id'],
+        ]

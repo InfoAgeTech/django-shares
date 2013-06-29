@@ -3,22 +3,17 @@ NOTE: This is not stable yet and will likely change!  Please don't use in produc
 ==============
 django-sharing
 ==============
-:Info: django-recurrence is a python recurrence module written for django.
-:Repository: https://github.com/InfoAgeTech/django-sharing
-:Author: Troy Grosfield (http://github.com/troygrosfield)
-:Maintainer: Troy Grosfield (http://github.com/troygrosfield)
+django-sharing is a python sharing module written for django that handles object sharing.  Don't clone.  Not stable.
 
+Build Status
+============
 .. image:: https://travis-ci.org/InfoAgeTech/django-sharing.png?branch=master
   :target: http://travis-ci.org/InfoAgeTech/django-sharing
 
-About
-=====
-
-Handles object sharing in django.  Don't clone.  Not stable.
 
 Example
 =======
-Basic example:
+Basic example::
 
     from django.contrib.contenttypes import generic
     from django.db import models
@@ -30,13 +25,13 @@ Basic example:
         shares = generic.GenericRelation(Share)
 
 
-Extending the sharing model:
+Extending the sharing model::
 
     from django.contrib.contenttypes import generic
     from django.db import models
-    from django_sharing.models import Share
+    from django_sharing.models import AbstractShare
 
-    class CarShare(Share):
+    class CarShare(AbstractShare):
         """Extending the share model to add additional attributes."""
         day = models.CharField(max_length=50)
 
@@ -48,4 +43,4 @@ Extending the sharing model:
 
 Running Tests
 =============
-    python manage.py test
+``python manage.py test``
