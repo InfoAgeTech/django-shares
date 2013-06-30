@@ -9,30 +9,30 @@ from .constants import Status
 class ShareManager(TokenManager):
     """Manager for sharing objects."""
 
-    def create_for_user(self, created_by_user, for_user, shared_object,
+    def create_for_user(self, created_user, for_user, shared_object,
                         status=Status.PENDING, **kwargs):
         """Create a share for an existing user.
         
-        :param created_by_user: the user creating the share.
+        :param created_user: the user creating the share.
         :param for_user: the user the shared object is being shared with.
         :param shared_object: the object being shared.
         :param status: the status of the shared object.
         :param kwargs: can be any keyword args on the sharing model.
         """
-        return self.create(created_user=created_by_user,
-                            last_modified_user=created_by_user,
+        return self.create(created_user=created_user,
+                            last_modified_user=created_user,
                             for_user=for_user,
                             shared_object=shared_object,
                             status=status,
                             **kwargs)
 
-    def create_for_non_user(self, created_by_user, shared_object, email,
+    def create_for_non_user(self, created_user, shared_object, email,
                             first_name, last_name, message=None,
                             status=Status.PENDING, **kwargs):
         """Create a share for a user who potentially isn't a member of the site
         yet.
         
-        :param created_by_user: the user creating the share.
+        :param created_user: the user creating the share.
         :param shared_object: the object being shared.
         :param email: email of the person being shared with.
         :param first_name: first name of the person being shared with.
@@ -41,8 +41,8 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object. Since this user isn't
             necessarily a site user yet.
         """
-        return self.create(created_user=created_by_user,
-                           last_modified_user=created_by_user,
+        return self.create(created_user=created_user,
+                           last_modified_user=created_user,
                            shared_object=shared_object,
                            email=email,
                            first_name=first_name,
