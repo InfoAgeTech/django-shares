@@ -19,8 +19,8 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object.
         :param kwargs: can be any keyword args on the sharing model.
         """
-        return self.create(created=created_by_user,
-                            last_modified=created_by_user,
+        return self.create(created_user=created_by_user,
+                            last_modified_user=created_by_user,
                             for_user=for_user,
                             shared_object=shared_object,
                             status=status,
@@ -41,8 +41,8 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object. Since this user isn't
             necessarily a site user yet.
         """
-        return self.create(created=created_by_user,
-                           last_modified=created_by_user,
+        return self.create(created_user=created_by_user,
+                           last_modified_user=created_by_user,
                            shared_object=shared_object,
                            email=email,
                            first_name=first_name,
