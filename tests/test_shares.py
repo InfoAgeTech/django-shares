@@ -6,16 +6,10 @@ from django.contrib.auth import get_user_model
 
 from django_sharing.models import Share
 from django_sharing.constants import Status
+from django_testing.user_utils import create_user
 
 User = get_user_model()
 
-def random_string():
-    return uuid.uuid4().hex[:8]
-
-def random_user():
-    random_username = random_string()
-    random_email = '{0}@{1}.com'.format(random_string(), random_string())
-    return User.objects.create_user(random_username, random_email)
 
 class ShareTests(TestCase):
 
@@ -23,11 +17,11 @@ class ShareTests(TestCase):
     def setUpClass(cls):
         """Run once per test case"""
         super(ShareTests, cls).setUpClass()
-        cls.user = random_user()
+        cls.user = create_user()
 
     def setUp(self):
         """Run once per test."""
-        self.shared_user = random_user()
+        self.shared_user = create_user()
 
     def test_add_for_user(self):
         """Share a user object with a another user."""
@@ -37,8 +31,8 @@ class ShareTests(TestCase):
                                               shared_object=self.shared_user)
         self.assertEqual(share.shared_object, self.shared_user)
 
-    def test_add_for_non_user(self):
-        """Share a user object with a another user."""
+    def test_create_for_non_user(self):
+        """Test for creating an object share with with an unknown user."""
         first_name = 'Jimmy'
         last_name = 'Buffet'
         email = 'hello@world.com'

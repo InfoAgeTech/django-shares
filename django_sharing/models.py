@@ -37,11 +37,13 @@ class AbstractShare(AbstractBaseModel):
     for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
     email = models.EmailField(db_index=True)
     first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
     last_sent = models.DateTimeField(default=datetime.utcnow)
     message = models.TextField(blank=True, null=True)
     token = models.CharField(max_length=50, db_index=True, unique=True)
-    status = models.CharField(max_length=25, choices=Status.CHOICES)
+    status = models.CharField(max_length=25,
+                              default=Status.PENDING,
+                              choices=Status.CHOICES)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     shared_object = generic.GenericForeignKey('content_type', 'object_id')
