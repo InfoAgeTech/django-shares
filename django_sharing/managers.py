@@ -9,7 +9,7 @@ from .constants import Status
 class ShareManager(TokenManager):
     """Manager for sharing objects."""
 
-    def create_for_user(self, created_user, for_user, shared_object,
+    def create_for_user(self, created_user, for_user, shared_object=None,
                         status=Status.PENDING, **kwargs):
         """Create a share for an existing user.
         
@@ -19,6 +19,9 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object.
         :param kwargs: can be any keyword args on the sharing model.
         """
+        if shared_object is None:
+            shared_object = self.instance
+
         return self.create(created_user=created_user,
                             last_modified_user=created_user,
                             for_user=for_user,
@@ -26,8 +29,8 @@ class ShareManager(TokenManager):
                             status=status,
                             **kwargs)
 
-    def create_for_non_user(self, created_user, shared_object, email,
-                            first_name, last_name, message=None,
+    def create_for_non_user(self, created_user, email, first_name, last_name,
+                            shared_object=None, message=None,
                             status=Status.PENDING, **kwargs):
         """Create a share for a user who potentially isn't a member of the site
         yet.
@@ -41,6 +44,9 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object. Since this user isn't
             necessarily a site user yet.
         """
+        if shared_object is None:
+            shared_object = self.instance
+
         return self.create(created_user=created_user,
                            last_modified_user=created_user,
                            shared_object=shared_object,

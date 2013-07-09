@@ -24,7 +24,7 @@ class AbstractShare(AbstractBaseModel):
     * first_name: first name of the person invited
     * last_name: last name of the person invited
     * last_sent: date time the share was last sent.
-    * created_id: the id of the user who sent the pending share
+    * created_user_id: the id of the user who sent the pending share
     * for_user_id: user_id the pending share is for (optional since they might  
         not be an actual user yet).
     * message: message sent to user in email.
@@ -90,6 +90,17 @@ class AbstractShare(AbstractBaseModel):
             setattr(self, attr, value)
 
         return self.save()
+
+    def copy(self, exclude_fields=None):
+        if exclude_fields is None:
+            exclude_fields = []
+
+        if 'token' not in exclude_fields:
+            # Token should be unique thus removed when making a copy of a share
+            # object.
+            exclude_fields.append('token')
+
+        return super(AbstractShare, self).copy(exclude_fields=exclude_fields)
 
 
 class Share(AbstractShare):
