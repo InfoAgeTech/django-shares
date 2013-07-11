@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django_tools.models import AbstractBaseModel
+from django_core.models import AbstractBaseModel
 from python_tools.list_utils import make_obj_list
 
 from .constants import Status

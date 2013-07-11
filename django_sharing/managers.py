@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
-from django_tools.managers import TokenManager
+from django_core.managers import TokenManager
 
 from .constants import Status
 
@@ -57,23 +57,23 @@ class ShareManager(TokenManager):
                            status=status,
                            **kwargs)
 
-    def get_for_user(self, user):
+    def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
-        return self.filter(for_user=user)
+        return self.filter(for_user=user, **kwargs)
 
-    def get_for_user_id(self, user_id):
+    def get_for_user_id(self, user_id, **kwargs):
         """Gets a shared objects for a user by user id."""
-        return self.filter(for_user_id=user_id)
+        return self.filter(for_user_id=user_id, **kwargs)
 
-    def get_by_email(self, email):
+    def get_by_email(self, email, **kwargs):
         """Gets shares by an email."""
         # TODO: To lower()?
-        return self.filter(Q(email=email) | Q(for_user__email=email))
+        return self.filter(Q(email=email) | Q(for_user__email=email), **kwargs)
 
-    def get_by_shared_object(self, obj):
+    def get_by_shared_object(self, obj, **kwargs):
         """Gets all shares for an object.
         
         :param obj: object to get shares for.
         """
         content_type = ContentType.objects.get_for_model(obj)
-        return self.filter(content_type=content_type, object_id=obj.id)
+        return self.filter(content_type=content_type, object_id=obj.id, **kwargs)

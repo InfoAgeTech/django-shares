@@ -17,7 +17,7 @@ setup(
     description='Sharing for django',
     author='Troy Grosfield',
     author_email='troy.grosfield@gmail.com',
-    url='https://github.com/troygrosfield/django-sharing',
+    url='https://github.com/InfoAgeTech/django-sharing',
     # license='MIT',
     packages=find_packages(),
     include_package_data=True,
