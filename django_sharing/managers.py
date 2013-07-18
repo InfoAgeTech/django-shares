@@ -11,7 +11,9 @@ class ShareManager(TokenManager):
 
     def create_for_user(self, created_user, for_user, shared_object=None,
                         status=Status.PENDING, **kwargs):
-        """Create a share for an existing user.
+        """Create a share for an existing user. This method ensures that only
+        one share will be created per user. So a user can only have at most 1
+        share to an object.
         
         :param created_user: the user creating the share.
         :param for_user: the user the shared object is being shared with.
@@ -22,12 +24,18 @@ class ShareManager(TokenManager):
         if shared_object is None:
             shared_object = self.instance
 
-        return self.create(created_user=created_user,
-                            last_modified_user=created_user,
-                            for_user=for_user,
-                            shared_object=shared_object,
-                            status=status,
-                            **kwargs)
+        if not kwargs:
+            kwargs = {}
+
+        kwargs.update({'created_user': created_user,
+                       'last_modified_user': created_user,
+                       'status': status})
+
+        content_type = ContentType.objects.get_for_model(model=shared_object)
+        return self.get_or_create(for_user=for_user,
+                                  content_type=content_type,
+                                  object_id=shared_object.id,
+                                  defaults=kwargs)[0]
 
     def create_for_non_user(self, created_user, email, first_name, last_name,
                             shared_object=None, message=None,
