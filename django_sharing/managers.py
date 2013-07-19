@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
+from django_core.managers import BaseManager
 from django_core.managers import TokenManager
 
 from .constants import Status
 
 
 class ShareManager(TokenManager):
-    """Manager for sharing objects."""
+    """Manager for the object share. This manager is used for the share
+    object (model) that either extends Share or implements AbstractShare.
+    """
 
     def create_for_user(self, created_user, for_user, shared_object=None,
                         status=Status.PENDING, **kwargs):
@@ -85,3 +88,27 @@ class ShareManager(TokenManager):
         """
         content_type = ContentType.objects.get_for_model(obj)
         return self.filter(content_type=content_type, object_id=obj.id, **kwargs)
+
+
+class SharedObjectManager(BaseManager):
+    """Manager for the object being shared.  This likely means you have some 
+    type of relation to shared objects.  The models will likely have something 
+    like:
+    
+    shares = generic.GenericRelation(SomeShare)
+    
+    Note: this manager assumes you're calling the shares "shares".
+    """
+
+    def get_for_user(self, for_user, status=None, **kwargs):
+        """Get objects that are being shared with this user.
+        
+        :param for_user: the user to get the objects for.
+        :param status: status of the share.  If None, all status' will be 
+            returned.  Otherwise, can be one of django_sharing.constants.Status
+            values.
+        """
+        if status is not None:
+            kwargs['shares__status'] = status
+
+        return self.filter(shares__for_user=for_user, **kwargs)
