@@ -8,11 +8,7 @@ class SharedObjectModelMixin(object):
 
     def get_share_for_user(self, user):
         """Gets a share object for by the user the share is for."""
-        for share in self.shares.all():
-            if share.for_user_id == user.id:
-                return share
-
-        return None
+        return self.shares.get_or_none(for_user_id=user.id)
 
     def accept_pending_share(self, user, token):
         """
