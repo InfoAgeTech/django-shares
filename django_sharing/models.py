@@ -91,7 +91,7 @@ class AbstractShare(AbstractBaseModel):
 
         return self.save()
 
-    def copy(self, exclude_fields=None):
+    def copy(self, exclude_fields=None, **kwargs):
         if exclude_fields is None:
             exclude_fields = []
 
@@ -100,7 +100,8 @@ class AbstractShare(AbstractBaseModel):
             # object.
             exclude_fields.append('token')
 
-        return super(AbstractShare, self).copy(exclude_fields=exclude_fields)
+        return super(AbstractShare, self).copy(exclude_fields=exclude_fields,
+                                               **kwargs)
 
 
 class Share(AbstractShare):
