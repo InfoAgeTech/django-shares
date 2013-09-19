@@ -17,7 +17,7 @@ class ShareManager(TokenManager):
         """Create a share for an existing user. This method ensures that only
         one share will be created per user. So a user can only have at most 1
         share to an object.
-        
+
         :param created_user: the user creating the share.
         :param for_user: the user the shared object is being shared with.
         :param shared_object: the object being shared.
@@ -45,7 +45,7 @@ class ShareManager(TokenManager):
                             status=Status.PENDING, **kwargs):
         """Create a share for a user who potentially isn't a member of the site
         yet.
-        
+
         :param created_user: the user creating the share.
         :param shared_object: the object being shared.
         :param email: email of the person being shared with.
@@ -83,7 +83,7 @@ class ShareManager(TokenManager):
 
     def get_by_shared_object(self, obj, **kwargs):
         """Gets all shares for an object.
-        
+
         :param obj: object to get shares for.
         """
         content_type = ContentType.objects.get_for_model(obj)
@@ -91,20 +91,20 @@ class ShareManager(TokenManager):
 
 
 class SharedObjectManager(BaseManager):
-    """Manager for the object being shared.  This likely means you have some 
-    type of relation to shared objects.  The models will likely have something 
+    """Manager for the object being shared.  This likely means you have some
+    type of relation to shared objects.  The models will likely have something
     like:
-    
+
     shares = generic.GenericRelation(SomeShare)
-    
+
     Note: this manager assumes you're calling the shares "shares".
     """
 
     def get_for_user(self, for_user, status=None, **kwargs):
         """Get objects that are being shared with this user.
-        
+
         :param for_user: the user to get the objects for.
-        :param status: status of the share.  If None, all status' will be 
+        :param status: status of the share.  If None, all status' will be
             returned.  Otherwise, can be one of django_sharing.constants.Status
             values.
         """

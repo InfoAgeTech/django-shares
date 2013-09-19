@@ -15,9 +15,9 @@ User = get_user_model()
 
 
 class AbstractShare(AbstractBaseModel):
-    """Abstract Base share object represents basic shared information for a 
+    """Abstract Base share object represents basic shared information for a
     specific user sharing an object.
-    
+
     Fields:
     * for_user: the user the object is shared with.
     * email: email of the user who the share was sent to if user is unknown.
@@ -25,14 +25,14 @@ class AbstractShare(AbstractBaseModel):
     * last_name: last name of the person invited
     * last_sent: date time the share was last sent.
     * created_user_id: the id of the user who sent the pending share
-    * for_user_id: user_id the pending share is for (optional since they might  
+    * for_user_id: user_id the pending share is for (optional since they might
         not be an actual user yet).
     * message: message sent to user in email.
     * content_type: the content type of the generic shared object
     * object_id: the object id of the shared object
     * shared_object: the object being shared.
-    * token: share token. 
-    
+    * token: share token.
+
     """
     for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
     email = models.EmailField(db_index=True)
@@ -54,7 +54,7 @@ class AbstractShare(AbstractBaseModel):
 
     @classmethod
     def save_prep(cls, instance_or_instances):
-        """Preprocess the object before the object is saved.  This automatically 
+        """Preprocess the object before the object is saved.  This automatically
         gets called when the save method gets called.
         """
         instances = make_obj_list(instance_or_instances)
@@ -67,8 +67,8 @@ class AbstractShare(AbstractBaseModel):
 
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.
-        
-        :param kwargs: additional fields that needs to be updated when the 
+
+        :param kwargs: additional fields that needs to be updated when the
             field is accepted.
         """
         self.status = Status.ACCEPTED
@@ -80,8 +80,8 @@ class AbstractShare(AbstractBaseModel):
 
     def decline(self, **kwargs):
         """Accept a share by updating the status to accepted.
-        
-        :param kwargs: additional fields that needs to be updated when the 
+
+        :param kwargs: additional fields that needs to be updated when the
             field is accepted.
         """
         self.status = Status.DECLINED
@@ -102,6 +102,30 @@ class AbstractShare(AbstractBaseModel):
 
         return super(AbstractShare, self).copy(exclude_fields=exclude_fields,
                                                **kwargs)
+
+    def get_full_name(self):
+        """Gets the full name of the person the share is for.  If it's a known
+        user (i.e. "for_user" attr is set) then the name will be pulled off
+        the user object.
+        """
+        first_name = self.first_name
+        last_name = self.last_name
+
+        if self.for_user:
+            first_name = self.for_user.first_name or first_name
+            last_name = self.for_user.last_name or last_name
+
+        return u' '.join([first_name, last_name]).strip()
+
+    def get_first_name(self):
+        """Gets the first name of the person the share is for. If it's a known
+        user (i.e. "for_user" attr is set) then the name will be pulled off
+        the user object.
+        """
+        if self.for_user:
+            return self.first_name
+
+        return self.first_name
 
 
 class Share(AbstractShare):
