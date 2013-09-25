@@ -13,7 +13,7 @@ class SharedObjectModelMixin(object):
     def accept_pending_share(self, user, token):
         """
         Accepts a share for a user.
-        
+
         :param user: user to accept the share for.
         :param token: token of the shared object
         """
@@ -29,7 +29,7 @@ class SharedObjectModelMixin(object):
     def decline_pending_share(self, user, token):
         """
         Declines a share for a user.
-        
+
         :param user: user to decline the share for.
         :param token: token of the shared object
         """
