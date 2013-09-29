@@ -63,7 +63,19 @@ class AbstractShare(AbstractBaseModel):
             if not instance.token:
                 instance.token = instance.__class__.objects.get_next_token()
 
-        return super(AbstractShare, cls).save_prep(instance_or_instances=instances)
+        return super(AbstractShare, cls).save_prep(
+                                            instance_or_instances=instances)
+
+    def is_accepted(self):
+        """Boolean indicating if the share is accepted."""
+        return self.status == Status.ACCEPTED
+
+    def is_pending(self):
+        """Boolean indicating if the share is pending."""
+        return self.status == Status.PENDING
+
+    def is_declined(self):
+        return self.status == Status.DECLINED
 
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.

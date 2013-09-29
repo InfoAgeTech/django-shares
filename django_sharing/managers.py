@@ -87,7 +87,8 @@ class ShareManager(TokenManager):
         :param obj: object to get shares for.
         """
         content_type = ContentType.objects.get_for_model(obj)
-        return self.filter(content_type=content_type, object_id=obj.id, **kwargs)
+        return self.filter(content_type=content_type, object_id=obj.id,
+                           **kwargs)
 
 
 class SharedObjectManager(BaseManager):
