@@ -77,6 +77,9 @@ class AbstractShare(AbstractBaseModel):
     def is_declined(self):
         return self.status == Status.DECLINED
 
+    def is_inactive(self):
+        return self.status == Status.INACTIVE
+
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.
 
@@ -103,6 +106,15 @@ class AbstractShare(AbstractBaseModel):
 
         return self.save()
 
+    def inactivate(self, **kwargs):
+        """Inactivate a share."""
+        self.status = Status.INACTIVE
+
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+
+        return self.save()
+
     def copy(self, exclude_fields=None, **kwargs):
         if exclude_fields is None:
             exclude_fields = []
@@ -120,12 +132,12 @@ class AbstractShare(AbstractBaseModel):
         user (i.e. "for_user" attr is set) then the name will be pulled off
         the user object.
         """
-        first_name = self.first_name
-        last_name = self.last_name
-
         if self.for_user:
-            first_name = self.for_user.first_name or first_name
-            last_name = self.for_user.last_name or last_name
+            first_name = self.for_user.first_name
+            last_name = self.for_user.last_name
+        else:
+            first_name = self.first_name
+            last_name = self.last_name
 
         return u' '.join([first_name, last_name]).strip()
 
@@ -138,6 +150,16 @@ class AbstractShare(AbstractBaseModel):
             return self.first_name
 
         return self.first_name
+
+    def get_last_name(self):
+        """Gets the last name of the person the share is for. If it's a known
+        user (i.e. "for_user" attr is set) then the name will be pulled off
+        the user object.
+        """
+        if self.for_user:
+            return self.last_name
+
+        return self.last_name
 
 
 class Share(AbstractShare):

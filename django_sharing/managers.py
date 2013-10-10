@@ -70,7 +70,15 @@ class ShareManager(TokenManager):
 
     def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
-        return self.filter(for_user=user, **kwargs)
+        queryset = self.filter(for_user=user, **kwargs)
+
+        if not hasattr(self, 'instance'):
+            return queryset
+
+        try:
+            return queryset.get()
+        except:
+            return None
 
     def get_for_user_id(self, user_id, **kwargs):
         """Gets a shared objects for a user by user id."""
@@ -79,7 +87,16 @@ class ShareManager(TokenManager):
     def get_by_email(self, email, **kwargs):
         """Gets shares by an email."""
         # TODO: To lower()?
-        return self.filter(Q(email=email) | Q(for_user__email=email), **kwargs)
+        queryset = self.filter(Q(email=email) | Q(for_user__email=email),
+                               **kwargs)
+
+        if not hasattr(self, 'instance'):
+            return queryset
+
+        try:
+            return queryset.get()
+        except:
+            return None
 
     def get_by_shared_object(self, obj, **kwargs):
         """Gets all shares for an object.
