@@ -147,7 +147,7 @@ class AbstractShare(AbstractBaseModel):
         the user object.
         """
         if self.for_user:
-            return self.first_name
+            return self.for_user.first_name
 
         return self.first_name
 
@@ -157,7 +157,7 @@ class AbstractShare(AbstractBaseModel):
         the user object.
         """
         if self.for_user:
-            return self.last_name
+            return self.for_user.last_name
 
         return self.last_name
 
