@@ -2,12 +2,13 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
 from django_core.managers import BaseManager
+from django_core.managers import CommonManager
 from django_core.managers import TokenManager
 
 from .constants import Status
 
 
-class ShareManager(TokenManager):
+class ShareManager(CommonManager, TokenManager):
     """Manager for the object share. This manager is used for the share
     object (model) that either extends Share or implements AbstractShare.
     """
@@ -24,7 +25,10 @@ class ShareManager(TokenManager):
         :param status: the status of the shared object.
         :param kwargs: can be any keyword args on the sharing model.
         """
-        if shared_object is None:
+        content_type = (self.content_type
+                        if hasattr(self, 'content_type') else None)
+
+        if shared_object is None and hasattr(self, 'instance'):
             shared_object = self.instance
 
         if not kwargs:
@@ -34,7 +38,9 @@ class ShareManager(TokenManager):
                        'last_modified_user': created_user,
                        'status': status})
 
-        content_type = ContentType.objects.get_for_model(model=shared_object)
+        if not content_type:
+            content_type = ContentType.objects.get_for_model(model=shared_object)
+
         return self.get_or_create(for_user=for_user,
                                   content_type=content_type,
                                   object_id=shared_object.id,

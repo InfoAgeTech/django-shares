@@ -54,8 +54,8 @@ class AbstractShare(AbstractBaseModel):
 
     @classmethod
     def save_prep(cls, instance_or_instances):
-        """Preprocess the object before the object is saved.  This automatically
-        gets called when the save method gets called.
+        """Preprocess the object before the object is saved.  This
+        automatically gets called when the save method gets called.
         """
         instances = make_obj_list(instance_or_instances)
 
@@ -115,7 +115,15 @@ class AbstractShare(AbstractBaseModel):
 
         return self.save()
 
-    def copy(self, exclude_fields=None, **kwargs):
+    def copy(self, exclude_fields=None, **override_fields):
+        """Returns an unsaved copy of the object minus any fields included in
+        `exclude_fields`.
+
+        :param exclude_fields: fields to exclude from the copy.  They will
+            fallback to the field default if one is given or None.
+        :param override_fields: kwargs with fields to override.  The key is the
+            field name, the value is the value to set the copied object to.
+        """
         if exclude_fields is None:
             exclude_fields = []
 
@@ -125,7 +133,7 @@ class AbstractShare(AbstractBaseModel):
             exclude_fields.append('token')
 
         return super(AbstractShare, self).copy(exclude_fields=exclude_fields,
-                                               **kwargs)
+                                               **override_fields)
 
     def get_full_name(self):
         """Gets the full name of the person the share is for.  If it's a known
