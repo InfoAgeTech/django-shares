@@ -2,7 +2,7 @@
 #       so i can call .shares.get_by_status?
 # -*- coding: utf-8 -*-
 from ..constants import Status
-from django_core.mixins.common import CommonSingleObjectMixin
+from django_core.mixins.common import CommonSingleObjectViewMixin
 from django.core.exceptions import PermissionDenied
 from django_sharing.utils import sort_shares_by_status
 from django_sharing.utils import get_share_for_user
@@ -73,7 +73,7 @@ class BaseShareViewMixin(object):
                     shares_by_status.get(status, []))
 
 
-class SharedObjectViewMixin(BaseShareViewMixin, CommonSingleObjectMixin):
+class SharedObjectViewMixin(BaseShareViewMixin, CommonSingleObjectViewMixin):
     """View mixin for a shared object.  The shared object is assumed to be
     the object returned from `get_object` call from anything that subclasses
     django.views.generic.detail.SingleObjectMixin
@@ -123,7 +123,7 @@ class ShareRequiredViewMixin(object):
         return super(ShareRequiredViewMixin, self).dispatch(*args, **kwargs)
 
 
-class CreatorRequiredViewMixin(CommonSingleObjectMixin):
+class CreatorRequiredViewMixin(CommonSingleObjectViewMixin):
     """Mixin that requires the self.object be created by the authenticated
     user.
     """
