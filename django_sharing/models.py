@@ -174,7 +174,7 @@ class Share(AbstractShare):
     """The implementation for a shared object."""
 
     class Meta:
-        ordering = ['-created_dttm']
+        ordering = ('-id',)
         # Make sure you can only have 1 share per user per shared_object
         unique_together = ('content_type', 'object_id', 'for_user',)
         index_together = [
