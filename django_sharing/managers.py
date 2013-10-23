@@ -76,8 +76,14 @@ class ShareManager(CommonManager, TokenManager):
 
     def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
+        if hasattr(self, 'instance') and hasattr(self.instance, 'shares'):
+            for share in self.instance.shares.all():
+                if share.for_user_id == user.id:
+                    return share
+
         queryset = self.filter(for_user=user, **kwargs)
 
+        # TODO: is this valid here?
         if not hasattr(self, 'instance'):
             return queryset
 
