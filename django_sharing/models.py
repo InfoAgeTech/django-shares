@@ -18,6 +18,12 @@ class AbstractShare(AbstractBaseModel):
     """Abstract Base share object represents basic shared information for a
     specific user sharing an object.
 
+    It's highly recommended that the implementing class puts a index on one of
+    the two options:
+
+    * object_id
+    * (object_id, content_type)
+
     Fields:
     * for_user: the user the object is shared with.
     * email: email of the user who the share was sent to if user is unknown.
@@ -177,6 +183,4 @@ class Share(AbstractShare):
         ordering = ('-id',)
         # Make sure you can only have 1 share per user per shared_object
         unique_together = ('content_type', 'object_id', 'for_user',)
-        index_together = [
-            ['content_type', 'object_id'],
-        ]
+        index_together = [('content_type', 'object_id')]
