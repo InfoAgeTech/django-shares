@@ -1,15 +1,127 @@
-# TODO: move this into the reusable sharing app and put on the object manager
-#       so i can call .shares.get_by_status?
 # -*- coding: utf-8 -*-
 from ..constants import Status
-from django_core.mixins.common import CommonSingleObjectViewMixin
 from django.core.exceptions import PermissionDenied
-from django_sharing.utils import sort_shares_by_status
-from django_sharing.utils import get_share_for_user
 from django.http.response import Http404
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import DeleteView
+from django_core.mixins.common import CommonSingleObjectViewMixin
+from django_sharing.mixins.forms import SharedObjectRemoveShareForm
+from django_sharing.utils import get_share_for_user
+from django_sharing.utils import sort_shares_by_status
 
 
-class BaseShareViewMixin(object):
+class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):
+    """For use when you have a shared object in context.  Use this view mixin
+    when the object viewing object is the the shared object.
+
+    Attributes
+    ==========
+    * is_object_shared_object: boolean indicating if the shared object is the
+        object that will be represented by the SingleObjectMixin.  This helps
+        to check in cases where the shared object is different than the object
+        for the view.  An example of this would be a view for a shared object's
+        share.  In this case the share would be the `object` for the view to
+        act on.
+
+        This value is determined if self.shared_object_model != self.model
+    """
+    is_object_shared_object = False
+
+    def dispatch(self, *args, **kwargs):
+        self.set_object_defaults()
+        self.shared_object = self.get_shared_object()
+
+        if self.is_object_shared_object:
+            self.object = self.shared_object
+        elif not hasattr(self, 'object'):
+            self.object = self.get_object()
+
+        return super(SharedSingleObjectMixin, self).dispatch(*args, **kwargs)
+
+    def set_object_defaults(self):
+        """If shared_object* attributes aren't set on the view, then fall back
+        to the SingleObjectMixin model attributes.
+        """
+        self.is_object_shared_object = self.model and self.shared_object_model
+
+        if not self.model and self.shared_object_model:
+            self.is_object_shared_object = True
+            self.model = self.shared_object_model
+
+        if not self.queryset and self.shared_object_queryset:
+            self.queryset = self.shared_object_queryset
+
+        if not self.pk_url_kwarg and self.shared_object_pk_url_kwarg:
+            self.pk_url_kwarg = self.shared_object_pk_url_kwarg
+
+        if (not self.context_object_name and
+            self.shared_object_context_object_name):
+            self.context_object_name = self.shared_object_context_object_name
+
+    # TODO: This might be overkill and I'm not sure this method is needed.
+    def get_object(self, **kwargs):
+        if self.object:
+            return self.object
+
+        try:
+            return super(SharedSingleObjectMixin, self).get_object(**kwargs)
+        except:
+            return self.shared_object
+
+
+class SharedObjectMixin(object):
+    """For use when you have a shared object in context."""
+
+    shared_object = None  # the object being shared
+    shared_object_model = None
+    shared_object_queryset = None
+    shared_object_pk_url_kwarg = None
+    shared_object_context_object_name = None
+
+    def dispatch(self, *args, **kwargs):
+        self.shared_object = self.get_shared_object()
+        return super(SharedObjectMixin, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SharedObjectMixin,
+                        self).get_context_data(**kwargs)
+        context['shared_object'] = self.shared_object
+        return context
+
+    def get_shared_object(self):
+        """Get the object that's being shared.  This can be overridden.
+        Defaults to self.object.
+        """
+        return self.shared_object
+
+
+class SharedObjectSharesViewMixin(object):
+    """View mixin for a shared object.  The shared object is assumed to be
+    the object returned from `get_object` call from anything that subclasses
+    django.views.generic.detail.SingleObjectMixin
+    """
+    shared_object_user_share = None  # auth user's share for this object
+    shared_object_shares_accepted = None
+    shared_object_shares_pending = None
+    shared_object_shares_declined = None
+    shared_object_shares_inactive = None
+
+    def dispatch(self, *args, **kwargs):
+        self.set_sharing_for_object(obj=self.get_shared_object(),
+                                    attr_prefix='shared_object')
+        return super(SharedObjectSharesViewMixin,
+                     self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SharedObjectSharesViewMixin,
+                        self).get_context_data(**kwargs)
+        context['shared_object_user_share'] = self.shared_object_user_share
+
+        for status in Status.get_keys():
+            attr_name = u'shared_object_shares_{0}'.format(status.lower())
+            context[attr_name] = getattr(self, attr_name, []) or []
+
+        return context
 
     def set_sharing_for_object(self, obj, attr_prefix=None):
         """Sets the sharing on the view.
@@ -55,6 +167,8 @@ class BaseShareViewMixin(object):
                     self.shared_object_shares_pending)
             setattr(self, u'{0}_shares_declined'.format(attr_prefix),
                     self.shared_object_shares_declined)
+            setattr(self, u'{0}_shares_inactive'.format(attr_prefix),
+                    self.shared_object_shares_inactive)
             return
 
         shares = obj.shares.all().prefetch_related('for_user',
@@ -66,46 +180,51 @@ class BaseShareViewMixin(object):
                 get_share_for_user(shares=shares,
                                    user=self.request.user))
 
-        for status in (Status.ACCEPTED, Status.PENDING, Status.DECLINED):
+        for status in Status.get_keys():
             attr_name = u'{0}_shares_{1}'.format(attr_prefix, status.lower())
             setattr(self,
                     attr_name,
                     shares_by_status.get(status, []))
 
 
-class SharedObjectViewMixin(BaseShareViewMixin, CommonSingleObjectViewMixin):
-    """View mixin for a shared object.  The shared object is assumed to be
-    the object returned from `get_object` call from anything that subclasses
-    django.views.generic.detail.SingleObjectMixin
+class SharedObjectUrlShareViewMixin(object):
+    """Adds the shared object share from a pk in the url.
+
+    This mixin puts the following attributes on the view:
+
+    * url_share: the share for the shared object with the token provided by
+        the 'token_url_kwarg'.
     """
-    shared_object = None  # the object being shared
-    shared_object_user_share = None  # auth user's share for this object
-    shared_object_shares_accepted = None
-    shared_object_shares_pending = None
-    shared_object_shares_declined = None
+
+    token_url_kwarg = 'token'
+    url_share = None
 
     def dispatch(self, *args, **kwargs):
-        self.shared_object = self.get_shared_object()
-        self.set_sharing_for_object(obj=self.shared_object,
-                                    attr_prefix='shared_object')
-        return super(SharedObjectViewMixin, self).dispatch(*args, **kwargs)
+        self.url_share = self.get_shared_object().shares.get_by_token_or_404(
+                                        token=kwargs.get(self.token_url_kwarg))
+        return super(SharedObjectUrlShareViewMixin,
+                     self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(SharedObjectViewMixin, self).get_context_data(**kwargs)
-        context['shared_object'] = self.shared_object
-        context['shared_object_user_share'] = self.shared_object_user_share
-
-        for status in (Status.ACCEPTED, Status.PENDING, Status.DECLINED):
-            attr_name = u'shared_object_shares_{0}'.format(status.lower())
-            context[attr_name] = getattr(self, attr_name, []) or []
-
+        context = super(SharedObjectUrlShareViewMixin,
+                        self).get_context_data(**kwargs)
+        context['url_share'] = self.url_share
         return context
 
-    def get_shared_object(self):
-        """Get the object that's being shared.  This can be overridden.
-        Defaults to self.object.
-        """
-        return self.get_object()
+
+class SharedObjectShareViewMixin(SharedObjectUrlShareViewMixin):
+
+    def get_object(self, **kwargs):
+        return self.url_share
+
+
+class SharedObjectRemoveShareFormView(SharedObjectShareViewMixin,
+                                      DeleteView):
+    """Form view to remove a share from a shared object."""
+    form_class = SharedObjectRemoveShareForm
+
+    def get_success_url(self):
+        return self.shared_object.get_absolute_url()
 
 
 class ShareRequiredViewMixin(object):
@@ -114,29 +233,10 @@ class ShareRequiredViewMixin(object):
 
     This method assumes the following mixin has already been called:
 
-        * django_sharing.mixins.views.SharedObjectViewMixin
+        * django_sharing.mixins.views.SharedObjectSharesViewMixin
     """
     def dispatch(self, *args, **kwargs):
         if not getattr(self, 'shared_object_user_share', None):
             raise PermissionDenied
 
         return super(ShareRequiredViewMixin, self).dispatch(*args, **kwargs)
-
-
-class CreatorRequiredViewMixin(CommonSingleObjectViewMixin):
-    """Mixin that requires the self.object be created by the authenticated
-    user.
-    """
-    def dispatch(self, request, *args, **kwargs):
-        # does self.object exist at this point?
-        share_obj = self.get_object()
-
-        if not share_obj:
-            raise Http404
-
-        if share_obj.created_user_id != request.user.id:
-            raise PermissionDenied
-
-        return super(CreatorRequiredViewMixin, self).dispatch(request,
-                                                              *args,
-                                                              **kwargs)
