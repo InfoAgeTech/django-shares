@@ -218,8 +218,8 @@ class SharedObjectShareViewMixin(SharedObjectUrlShareViewMixin):
         return self.url_share
 
 
-class SharedObjectRemoveShareFormView(SharedObjectShareViewMixin,
-                                      DeleteView):
+class SharedObjectRemoveShareDeleteView(SharedObjectShareViewMixin,
+                                        DeleteView):
     """Form view to remove a share from a shared object."""
     form_class = SharedObjectRemoveShareForm
 
