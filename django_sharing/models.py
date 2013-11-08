@@ -40,7 +40,10 @@ class AbstractShare(AbstractBaseModel):
     * token: share token.
 
     """
-    for_user = models.ForeignKey(User, blank=True, null=True, related_name='+')
+    for_user = models.ForeignKey(User,
+                                 blank=True,
+                                 null=True,
+                                 related_name='for_user+')
     email = models.EmailField(db_index=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100, blank=True, null=True)
