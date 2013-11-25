@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import uuid
-
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-
-from django_sharing.models import Share
+from django.test import TestCase
 from django_sharing.constants import Status
+from django_sharing.models import Share
 from django_testing.user_utils import create_user
+
 
 User = get_user_model()
 

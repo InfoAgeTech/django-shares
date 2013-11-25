@@ -11,6 +11,7 @@ from python_tools.list_utils import make_obj_list
 from .constants import Status
 from .managers import ShareManager
 
+
 User = get_user_model()
 
 

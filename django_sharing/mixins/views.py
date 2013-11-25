@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from ..constants import Status
 from django.core.exceptions import PermissionDenied
-from django.http.response import Http404
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django_core.mixins.common import CommonSingleObjectViewMixin
 from django_sharing.mixins.forms import SharedObjectRemoveShareForm
 from django_sharing.utils import get_share_for_user
 from django_sharing.utils import sort_shares_by_status
+
+from ..constants import Status
 
 
 class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):
