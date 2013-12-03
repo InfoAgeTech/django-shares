@@ -172,7 +172,8 @@ class SharedObjectSharesViewMixin(object):
             return
 
         shares = obj.shares.all().prefetch_related('for_user',
-                                                   'created_user')
+                                                   'created_user',
+                                                   'shared_object')
 
         shares_by_status = sort_shares_by_status(shares=shares)
         setattr(self,
