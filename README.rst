@@ -43,4 +43,6 @@ Extending the sharing model::
 
 Running Tests
 =============
-``python manage.py test``
+From the tests directory where the manage.py file is, run the following command::
+
+    python manage.py test
