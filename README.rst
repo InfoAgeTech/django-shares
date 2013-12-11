@@ -1,15 +1,14 @@
 NOTE: This is not stable yet and will likely change!  Please don't use in production until the 1.0 release.
 
-==============
-django-sharing
-==============
-django-sharing is a python sharing module written for django that handles object sharing.  Don't clone.  Not stable.
-
-Build Status
-============
-.. image:: https://travis-ci.org/InfoAgeTech/django-sharing.png?branch=master
+.. |travisci| image:: https://travis-ci.org/InfoAgeTech/django-sharing.png?branch=master
   :target: http://travis-ci.org/InfoAgeTech/django-sharing
+.. |coveralls| image:: https://coveralls.io/repos/InfoAgeTech/django-sharing/badge.png
+  :target: https://coveralls.io/r/InfoAgeTech/django-sharing
 
+=====================================
+django-sharing |travisci| |coveralls|
+=====================================
+django-sharing is a python sharing module written for django that handles object sharing.  Don't clone.  Not stable.
 
 Example
 =======
