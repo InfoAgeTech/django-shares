@@ -74,6 +74,31 @@ class ShareManager(CommonManager, TokenManager):
                            status=status,
                            **kwargs)
 
+    def bulk_create(self, shares, *args, **kwargs):
+        """Bulk create's shares for object.
+
+        This method also protects from users having duplicate shares to an
+        object when this method is called from an instance of a class.  So, if
+        a share is for a user who already has a share to the shared object,
+        that share will not be added in the bulk_create.
+        """
+        if hasattr(self, 'instance') and hasattr(self.instance, 'shares'):
+            current_share_users = [s.for_user
+                                   for s in self.instance.shares.all()
+                                   if s.for_user]
+            shares = [s for s in shares
+                      if s.for_user not in current_share_users]
+
+            for share in shares:
+                # TODO: does this need to check for type?  Can 'instance' be a
+                #       BillShare object instead of a Bill object?  Is this the
+                #       correct behavior?
+                if not share.shared_object:
+                    share.shared_object = self.instance
+
+        return super(ShareManager, self).bulk_create(objs=shares, *args,
+                                                     **kwargs)
+
     def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
         if hasattr(self, 'instance') and hasattr(self.instance, 'shares'):
