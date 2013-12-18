@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import ugettext as _
 from django_core.models import AbstractBaseModel
 from python_tools.list_utils import make_obj_list
 
@@ -45,8 +46,10 @@ class AbstractShare(AbstractBaseModel):
                                  blank=True,
                                  null=True,
                                  related_name='for_user+')
-    email = models.EmailField(db_index=True)
-    first_name = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True, db_index=True,
+                              help_text=_('Email address of the person you '
+                                          'want to share with.'))
+    first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
     last_sent = models.DateTimeField(default=datetime.utcnow)
     message = models.TextField(blank=True, null=True)
@@ -178,6 +181,16 @@ class AbstractShare(AbstractBaseModel):
             return self.for_user.last_name
 
         return self.last_name
+
+    def get_email(self):
+        """Gets the email address for the person the share is for.  It's it's
+        a known user (i.e. "for_user" attr is set) then the email will be
+        pulled off the user object.
+        """
+        if self.for_user:
+            return self.for_user.email
+
+        return self.email
 
 
 class Share(AbstractShare):
