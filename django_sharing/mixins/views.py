@@ -224,6 +224,11 @@ class SharedObjectRemoveShareDeleteView(SharedObjectShareViewMixin,
     """Form view to remove a share from a shared object."""
     form_class = SharedObjectRemoveShareForm
 
+    def delete(self, request, *args, **kwargs):
+        self.url_share.last_modified_user = self.request.user
+        return super(SharedObjectRemoveShareDeleteView,
+                     self).delete(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.shared_object.get_absolute_url()
 

@@ -6,6 +6,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext as _
+from django_core.mixins.models.tokens import AbstractTokenModel
 from django_core.models import AbstractBaseModel
 from python_tools.list_utils import make_obj_list
 
@@ -16,7 +17,7 @@ from .managers import ShareManager
 User = get_user_model()
 
 
-class AbstractShare(AbstractBaseModel):
+class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     """Abstract Base share object represents basic shared information for a
     specific user sharing an object.
 
@@ -27,19 +28,19 @@ class AbstractShare(AbstractBaseModel):
     * (object_id, content_type)
 
     Fields:
-    * for_user: the user the object is shared with.
+    * for_user: the user the object is shared with. This is optional since the
+        user might not exist yet.
     * email: email of the user who the share was sent to if user is unknown.
     * first_name: first name of the person invited
     * last_name: last name of the person invited
     * last_sent: date time the share was last sent.
-    * created_user_id: the id of the user who sent the pending share
-    * for_user_id: user_id the pending share is for (optional since they might
-        not be an actual user yet).
     * message: message sent to user in email.
+    * status: status of the share (PENDING, ACCEPTED, DECLINED, etc)
+    * response_dttm: the datetime the share was responded.
     * content_type: the content type of the generic shared object
     * object_id: the object id of the shared object
     * shared_object: the object being shared.
-    * token: share token.
+    * token: unique share token.
 
     """
     for_user = models.ForeignKey(User,
@@ -53,10 +54,10 @@ class AbstractShare(AbstractBaseModel):
     last_name = models.CharField(max_length=100, blank=True, null=True)
     last_sent = models.DateTimeField(default=datetime.utcnow)
     message = models.TextField(blank=True, null=True)
-    token = models.CharField(max_length=50, db_index=True, unique=True)
     status = models.CharField(max_length=25,
                               default=Status.PENDING,
                               choices=Status.CHOICES)
+    response_dttm = models.DateTimeField(blank=True, null=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     shared_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -73,8 +74,9 @@ class AbstractShare(AbstractBaseModel):
         instances = make_obj_list(instance_or_instances)
 
         for instance in instances:
-            if not instance.token:
-                instance.token = instance.__class__.objects.get_next_token()
+
+            if not instance.is_pending() and not instance.response_dttm:
+                instance.response_dttm = datetime.utcnow()
 
         return super(AbstractShare, cls).save_prep(
                                             instance_or_instances=instances)
@@ -100,6 +102,7 @@ class AbstractShare(AbstractBaseModel):
             field is accepted.
         """
         self.status = Status.ACCEPTED
+        self.response_dttm = datetime.utcnow()
 
         for attr, value in kwargs.items():
             setattr(self, attr, value)
@@ -113,6 +116,7 @@ class AbstractShare(AbstractBaseModel):
             field is accepted.
         """
         self.status = Status.DECLINED
+        self.response_dttm = datetime.utcnow()
 
         for attr, value in kwargs.items():
             setattr(self, attr, value)
@@ -122,6 +126,7 @@ class AbstractShare(AbstractBaseModel):
     def inactivate(self, **kwargs):
         """Inactivate a share."""
         self.status = Status.INACTIVE
+        self.response_dttm = datetime.utcnow()
 
         for attr, value in kwargs.items():
             setattr(self, attr, value)
