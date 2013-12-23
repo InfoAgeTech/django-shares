@@ -1,5 +1,4 @@
 from django.db import models
-from django_core.models.mixins.crud import AbstractSafeDeleteModelMixin
 from django_sharing.constants import Status
 
 from ..managers import SharedObjectManager
@@ -35,18 +34,3 @@ class AbstractSharedObjectModelMixin(models.Model):
     def get_share_class(self):
         """Gets the class instance associated to the "shares" model field."""
         return self.shares.model
-
-
-class AbstractShareSafeDeleteModelMixin(AbstractSafeDeleteModelMixin):
-
-    class Meta:
-        abstract = True
-
-    def delete_safe(self, **kwargs):
-        """Delete safe is different from ``delete(...)`` in that it doesn't
-        actually delete the object.  It simply sets the ``is_deleted`` indicator
-        to True, but doens't remove the object from the database.  If you want
-        to remove the object from the database, call the ``delete(...)`` method.
-        """
-        self.status = Status.DELETED
-        super(AbstractShareSafeDeleteModelMixin, self).delete_safe(**kwargs)
