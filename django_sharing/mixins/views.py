@@ -2,12 +2,14 @@
 from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
+from django.views.generic.edit import UpdateView
 from django_core.views.mixins.common import CommonSingleObjectViewMixin
 from django_sharing.mixins.forms import SharedObjectRemoveShareForm
 from django_sharing.utils import get_share_for_user
 from django_sharing.utils import sort_shares_by_status
 
 from ..constants import Status
+from django.views.generic.edit import FormView
 
 
 class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):

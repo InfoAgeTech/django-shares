@@ -25,7 +25,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django_core',
-    'django_nose',
     'django_sharing',
     'django_testing',
     'python_tools',
@@ -37,8 +36,6 @@ SECRET_KEY = '12345abcd'
 
 # Added in django 1.4.4. See: https://docs.djangoproject.com/en/1.4/releases/1.4.4/#host-header-poisoning
 ALLOWED_HOSTS = ['*']
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 here = lambda *x: os.path.join(os.path.abspath(os.path.dirname(__file__)), *x)
 

@@ -11,6 +11,7 @@ class Status(object):
     """
     ACCEPTED = 'ACCEPTED'
     DECLINED = 'DECLINED'
+    DELETED = 'DELETED'
     PENDING = 'PENDING'
     INACTIVE = 'INACTIVE'
     CHOICES = ((ACCEPTED, 'Accepted'),
@@ -22,6 +23,6 @@ class Status(object):
     def get_keys(cls):
         """Gets a tuple of all the status keys.
 
-        (ACCEPTED, DECLINED, PENDING, INACTIVE)
+        (ACCEPTED, DECLINED, DELETED, PENDING, INACTIVE)
         """
         return (choice[0] for choice in cls.CHOICES)

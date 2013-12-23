@@ -5,7 +5,6 @@ from django_core.models.managers import BaseManager
 from django_core.models.managers import CommonManager
 from django_core.models.managers import SafeDeleteManager
 from django_core.models.managers import TokenManager
-from django_sharing.db.query import SharedObjectSafeDeleteQuerySet
 
 from .constants import Status
 
@@ -175,12 +174,3 @@ class SharedObjectManager(BaseManager):
             kwargs['shares__status'] = status
 
         return self.filter(shares__for_user=for_user, **kwargs)
-
-
-class SharedObjectSafeDeleteManager(SharedObjectManager, SafeDeleteManager):
-    """Shared"""
-
-    def get_queryset(self, *args, **kwargs):
-        return SharedObjectSafeDeleteQuerySet(self.model, using=self._db,
-                                              *args, **kwargs)
-
