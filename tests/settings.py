@@ -24,10 +24,12 @@ USE_I18N = True
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django_sharing',
-    'django_testing',
     'django_core',
     'django_nose',
+    'django_sharing',
+    'django_testing',
+    'python_tools',
+    'test_models',
 )
 
 # Added in django 1.5 secret key is required.  This is a random generated string

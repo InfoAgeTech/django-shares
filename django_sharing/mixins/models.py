@@ -1,4 +1,5 @@
 from django.db import models
+from django_core.models.mixins.crud import AbstractSafeDeleteModelMixin
 
 from ..managers import SharedObjectManager
 
@@ -33,3 +34,22 @@ class AbstractSharedObject(models.Model):
     def get_share_class(self):
         """Gets the class instance associated to the "shares" model field."""
         return self.shares.model
+
+
+class AbstractSharedObjectSafeDeleteModelMixin(AbstractSharedObject,
+                                               AbstractSafeDeleteModelMixin):
+    """Model mixin for safe deleting shares to an object."""
+
+    class Meta:
+        abstract = True
+
+    def delete_safe(self, **kwargs):
+        """Handles the deleting of an object.  Sets
+
+        """
+        super(AbstractSharedObjectSafeDeleteModelMixin,
+              self).delete_safe(**kwargs)
+
+        if hasattr(self, 'shares'):
+            self.shares.all().delete_safe()
+

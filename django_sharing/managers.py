@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
-from django_core.managers import BaseManager
-from django_core.managers import CommonManager
-from django_core.managers import TokenManager
+from django_core.models.managers import BaseManager
+from django_core.models.managers import CommonManager
+from django_core.models.managers import SafeDeleteManager
+from django_core.models.managers import TokenManager
+from django_sharing.db.query import SharedObjectSafeDeleteQuerySet
 
 from .constants import Status
 
@@ -101,6 +103,9 @@ class ShareManager(CommonManager, TokenManager):
 
     def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
+        # TODO: could optimize this to first look and see if the shares have
+        #       already been prefetched.  If so, do the loop, it not don't make
+        #       the call to pull back all the shares.
         if hasattr(self, 'instance') and hasattr(self.instance, 'shares'):
             for share in self.instance.shares.all():
                 if share.for_user_id == user.id:
@@ -108,11 +113,14 @@ class ShareManager(CommonManager, TokenManager):
 
         queryset = self.filter(for_user=user, **kwargs)
 
-        # TODO: is this valid here?
+        # If there isn't an ``instance`` then this was not called from an
+        # instance of an object so all shares for a user will be returned.
         if not hasattr(self, 'instance'):
             return queryset
 
         try:
+            # This is being called from an object instance and since a user
+            # can only have 1 share per user, return that share.
             return queryset.get()
         except:
             return None
@@ -167,3 +175,12 @@ class SharedObjectManager(BaseManager):
             kwargs['shares__status'] = status
 
         return self.filter(shares__for_user=for_user, **kwargs)
+
+
+class SharedObjectSafeDeleteManager(SharedObjectManager, SafeDeleteManager):
+    """Shared"""
+
+    def get_queryset(self, *args, **kwargs):
+        return SharedObjectSafeDeleteQuerySet(self.model, using=self._db,
+                                              *args, **kwargs)
+
