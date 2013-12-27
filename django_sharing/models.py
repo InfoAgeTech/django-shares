@@ -95,6 +95,9 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     def is_inactive(self):
         return self.status == Status.INACTIVE
 
+    def is_deleted(self):
+        return self.status == Status.DELETED
+
     def accept(self, **kwargs):
         """Accept a share by updating the status to accepted.
 

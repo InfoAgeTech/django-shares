@@ -2,14 +2,12 @@
 from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
-from django.views.generic.edit import UpdateView
 from django_core.views.mixins.common import CommonSingleObjectViewMixin
-from django_sharing.mixins.forms import SharedObjectRemoveShareForm
-from django_sharing.utils import get_share_for_user
-from django_sharing.utils import sort_shares_by_status
 
 from ..constants import Status
-from django.views.generic.edit import FormView
+from ..utils import get_share_for_user
+from ..utils import sort_shares_by_status
+from .forms import SharedObjectRemoveShareForm
 
 
 class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):
@@ -107,6 +105,7 @@ class SharedObjectSharesViewMixin(object):
     shared_object_shares_pending = None
     shared_object_shares_declined = None
     shared_object_shares_inactive = None
+    shared_object_shares_deleted = None
 
     def dispatch(self, *args, **kwargs):
         self.set_sharing_for_object(obj=self.get_shared_object(),
@@ -171,6 +170,8 @@ class SharedObjectSharesViewMixin(object):
                     self.shared_object_shares_declined)
             setattr(self, u'{0}_shares_inactive'.format(attr_prefix),
                     self.shared_object_shares_inactive)
+            setattr(self, u'{0}_shares_deleted'.format(attr_prefix),
+                    self.shared_object_shares_deleted)
             return
 
         shares = obj.shares.all().prefetch_related('for_user',
@@ -203,8 +204,7 @@ class SharedObjectUrlShareViewMixin(object):
     url_share = None
 
     def dispatch(self, *args, **kwargs):
-        self.url_share = self.get_shared_object().shares.get_by_token_or_404(
-                                        token=kwargs.get(self.token_url_kwarg))
+        self.url_share = self.get_url_share(**kwargs)
         return super(SharedObjectUrlShareViewMixin,
                      self).dispatch(*args, **kwargs)
 
@@ -214,11 +214,18 @@ class SharedObjectUrlShareViewMixin(object):
         context['url_share'] = self.url_share
         return context
 
+    def get_url_share(self, **kwargs):
+        if self.url_share == None:
+            self.url_share = self.get_shared_object().shares.get_by_token_or_404(
+                                        token=kwargs.get(self.token_url_kwarg))
+
+        return self.url_share
+
 
 class SharedObjectShareViewMixin(SharedObjectUrlShareViewMixin):
 
     def get_object(self, **kwargs):
-        return self.url_share
+        return self.get_url_share(**kwargs)
 
 
 class SharedObjectRemoveShareDeleteView(SharedObjectShareViewMixin,

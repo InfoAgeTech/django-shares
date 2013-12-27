@@ -16,6 +16,7 @@ class Status(object):
     INACTIVE = 'INACTIVE'
     CHOICES = ((ACCEPTED, 'Accepted'),
                (DECLINED, 'Declined'),
+               (DELETED, 'Deleted'),
                (PENDING, 'Pending'),
                (INACTIVE, 'Inactive'))
 
