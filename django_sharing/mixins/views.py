@@ -14,8 +14,8 @@ class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):
     """For use when you have a shared object in context.  Use this view mixin
     when the object viewing object is the the shared object.
 
-    Attributes
-    ==========
+    Attributes:
+
     * is_object_shared_object: boolean indicating if the shared object is the
         object that will be represented by the SingleObjectMixin.  This helps
         to check in cases where the shared object is different than the object
