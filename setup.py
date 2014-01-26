@@ -20,7 +20,7 @@ classifiers = [
 README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
 setup(
-    name='django-sharing',
+    name='django-shares',
     version='0.0.1',
     description='Sharing for django',
     author='Troy Grosfield',
