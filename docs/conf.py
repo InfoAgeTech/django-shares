@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# django-sharing documentation build configuration file, created by
+# django-shares documentation build configuration file, created by
 # sphinx-quickstart on Thu Feb 21 12:52:04 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -11,12 +11,13 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.append(os.path.abspath('../django_sharing'))
+sys.path.append(os.path.abspath('../django_shares'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -40,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-sharing'
+project = u'django-shares'
 copyright = u'2013, Troy Grosfield'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +165,7 @@ html_show_copyright = True
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'django-sharingdoc'
+htmlhelp_basename = 'django-sharesdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -183,7 +184,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'django-sharing.tex', u'django-sharing Documentation',
+  ('index', 'django-shares.tex', u'django-shares Documentation',
    u'Troy Grosfield', 'manual'),
 ]
 
@@ -213,7 +214,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-sharing', u'django-sharing Documentation',
+    ('index', 'django-shares', u'django-shares Documentation',
      [u'Troy Grosfield'], 1)
 ]
 
@@ -227,8 +228,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'django-sharing', u'django-sharing Documentation',
-   u'Troy Grosfield', 'django-sharing', 'One line description of project.',
+  ('index', 'django-shares', u'django-shares Documentation',
+   u'Troy Grosfield', 'django-shares', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -245,7 +246,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'django-sharing'
+epub_title = u'django-shares'
 epub_author = u'Troy Grosfield'
 epub_publisher = u'Troy Grosfield'
 epub_copyright = u'2013, Troy Grosfield'

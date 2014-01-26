@@ -4,10 +4,10 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django_core.views.mixins.common import CommonSingleObjectViewMixin
 
-from ..constants import Status
-from ..utils import get_share_for_user
-from ..utils import sort_shares_by_status
-from .forms import SharedObjectRemoveShareForm
+from django_shares.constants import Status
+from django_shares.mixins.forms import SharedObjectRemoveShareForm
+from django_shares.utils import get_share_for_user
+from django_shares.utils import sort_shares_by_status
 
 
 class SharedSingleObjectMixin(CommonSingleObjectViewMixin, SingleObjectMixin):
@@ -248,7 +248,7 @@ class ShareRequiredViewMixin(object):
 
     This method assumes the following mixin has already been called:
 
-        * django_sharing.mixins.views.SharedObjectSharesViewMixin
+        * django_shares.mixins.views.SharedObjectSharesViewMixin
     """
     def dispatch(self, *args, **kwargs):
         if not getattr(self, 'shared_object_user_share', None):

@@ -166,7 +166,7 @@ class SharedObjectManager(BaseManager):
 
         :param for_user: the user to get the objects for.
         :param status: status of the share.  If None, all status' will be
-            returned.  Otherwise, can be one of django_sharing.constants.Status
+            returned.  Otherwise, can be one of django_shares.constants.Status
             values.
         """
         if status is not None:

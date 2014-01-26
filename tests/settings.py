@@ -25,7 +25,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django_core',
-    'django_sharing',
+    'django_shares',
     'django_testing',
     'python_tools',
     'test_models',
