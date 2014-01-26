@@ -7,3 +7,4 @@
 *.log
 *.db
 __pycache__
+docs/guide
