@@ -15,6 +15,12 @@ Docs
 
 http://django-shares.readthedocs.org
 
+Installation
+============
+Install via pip::
+
+   pip install django-shares
+
 Example
 =======
 Basic example::
