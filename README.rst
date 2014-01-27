@@ -7,7 +7,7 @@ NOTE: This is not stable yet and will likely change!  Please don't use in produc
 .. image:: https://badge.fury.io/py/django-shares.png
     :target: http://badge.fury.io/py/django-shares
 .. image:: https://pypip.in/license/django-shares/badge.png
-    :target: https://pypi.python.org/pypi/django-shares/
+    :target: https://github.com/InfoAgeTech/django-shares/blob/master/LICENSE
 
 =============
 django-shares
