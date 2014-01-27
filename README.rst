@@ -10,6 +10,11 @@ django-shares |travisci| |coveralls|
 ====================================
 django-shares is a python sharing module written for django that handles object sharing.  Don't clone.  Not stable.
 
+Docs
+====
+
+http://django-shares.readthedocs.org
+
 Example
 =======
 Basic example::
