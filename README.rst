@@ -1,13 +1,17 @@
 NOTE: This is not stable yet and will likely change!  Please don't use in production until the 1.0 release.
 
-.. |travisci| image:: https://travis-ci.org/InfoAgeTech/django-shares.png?branch=master
-  :target: http://travis-ci.org/InfoAgeTech/django-shares
-.. |coveralls| image:: https://coveralls.io/repos/InfoAgeTech/django-shares/badge.png
-  :target: https://coveralls.io/r/InfoAgeTech/django-shares
+.. image:: https://travis-ci.org/InfoAgeTech/django-shares.png?branch=master
+    :target: http://travis-ci.org/InfoAgeTech/django-shares
+.. image:: https://coveralls.io/repos/InfoAgeTech/django-shares/badge.png
+    :target: https://coveralls.io/r/InfoAgeTech/django-shares
+.. image:: https://badge.fury.io/py/django-shares.png
+    :target: http://badge.fury.io/py/django-shares
+.. image:: https://pypip.in/license/django-shares/badge.png
+    :target: https://pypi.python.org/pypi/django-shares/
 
-====================================
-django-shares |travisci| |coveralls|
-====================================
+=============
+django-shares
+=============
 django-shares is a python sharing module written for django that handles object sharing.  Don't clone.  Not stable.
 
 Docs
