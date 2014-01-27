@@ -27,12 +27,15 @@ INSTALLED_APPS = (
     'django_core',
     'django_shares',
     'django_testing',
+    'django_nose',
     'python_tools',
     'test_models',
 )
 
 # Added in django 1.5 secret key is required.  This is a random generated string
 SECRET_KEY = '12345abcd'
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Added in django 1.4.4. See: https://docs.djangoproject.com/en/1.4/releases/1.4.4/#host-header-poisoning
 ALLOWED_HOSTS = ['*']
