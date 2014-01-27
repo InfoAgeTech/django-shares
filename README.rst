@@ -21,7 +21,7 @@ http://django-shares.readthedocs.org
 
 Installation
 ============
-Install via pip::
+Install from `pypi <https://pypi.python.org/pypi/django-shares>`_ via pip::
 
    pip install django-shares
 

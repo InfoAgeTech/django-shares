@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
-from django_core.models.managers import BaseManager
-from django_core.models.managers import CommonManager
-from django_core.models.managers import TokenManager
+from django_core.db.models.managers import BaseManager
+from django_core.db.models.managers import CommonManager
+from django_core.db.models.managers import TokenManager
 
 from .constants import Status
 
