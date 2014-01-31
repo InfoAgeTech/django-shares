@@ -19,7 +19,6 @@ from .db.models import ShareManager
 User = get_user_model()
 
 
-@python_2_unicode_compatible
 class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     """Abstract Base share object represents basic shared information for a
     specific user sharing an object.
@@ -207,6 +206,7 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
         return self.email
 
 
+@python_2_unicode_compatible
 class Share(AbstractShare):
     """The implementation for a shared object."""
 
