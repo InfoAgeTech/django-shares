@@ -69,7 +69,7 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     class Meta:
         abstract = True
 
-    def str(self):
+    def __str__(self):
         return str(self.id)
 
     @classmethod
