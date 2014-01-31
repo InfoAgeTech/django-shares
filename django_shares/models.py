@@ -69,6 +69,9 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     class Meta:
         abstract = True
 
+    def str(self):
+        return str(self.id)
+
     @classmethod
     def save_prep(cls, instance_or_instances):
         """Preprocess the object before the object is saved.  This
