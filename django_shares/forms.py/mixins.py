@@ -1,8 +1,4 @@
-from django import forms
-
-
-class SharedObjectRemoveShareForm(forms.Form):
-    """Form for removing a shared object share."""
+from __future__ import unicode_literals
 
 
 class SharedObjectFormMixin(object):

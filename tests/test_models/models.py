@@ -1,8 +1,8 @@
 from django.contrib.contenttypes import generic
 from django.db import models
 
-from django_shares.managers import SharedObjectManager
-from django_shares.mixins.models import AbstractSharedObjectModelMixin
+from django_shares.db.models import AbstractSharedObjectModelMixin
+from django_shares.db.models.managers import SharedObjectManager
 
 
 class TestSharedObjectModel(AbstractSharedObjectModelMixin):

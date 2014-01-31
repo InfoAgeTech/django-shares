@@ -6,12 +6,12 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext as _
-from django_core.db.models.mixins.base import AbstractBaseModel
-from django_core.db.models.mixins.tokens import AbstractTokenModel
+from django_core.db.models import AbstractBaseModel
+from django_core.db.models import AbstractTokenModel
 from python_tools.list_utils import make_obj_list
 
 from .constants import Status
-from .managers import ShareManager
+from .db.models import ShareManager
 
 
 User = get_user_model()

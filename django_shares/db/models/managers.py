@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
-from django_core.db.models.managers import BaseManager
-from django_core.db.models.managers import CommonManager
-from django_core.db.models.managers import TokenManager
+from django_core.db.models import BaseManager
+from django_core.db.models import CommonManager
+from django_core.db.models import TokenManager
 
-from .constants import Status
+from ...constants import Status
 
 
 class ShareManager(CommonManager, TokenManager):

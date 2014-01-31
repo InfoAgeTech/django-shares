@@ -6,8 +6,10 @@
 Welcome to django-shares documentation!
 =======================================
 
-:doc:`apireference`
-  The complete API documentation.
+.. toctree::
+   :maxdepth: 2
+
+   api
 
 Indices and tables
 ==================
@@ -15,4 +17,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

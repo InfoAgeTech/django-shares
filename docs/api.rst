@@ -5,5 +5,5 @@ API Reference
 Models
 ======
 
-.. autoclass:: django_shares.models.Share
+.. automodule:: django_shares.models
    :members:

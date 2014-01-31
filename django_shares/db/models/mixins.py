@@ -1,8 +1,8 @@
 from django.db import models
 from django_core.db.models.mixins.crud import AbstractSafeDeleteModelMixin
 
-from ..constants import Status
-from ..managers import SharedObjectManager
+from ...constants import Status
+from .managers import SharedObjectManager
 
 
 class AbstractSharedObjectModelMixin(models.Model):
