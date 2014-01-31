@@ -1,4 +1,3 @@
 # TODO: update the versions on these when I've released 1.0
 
 https://github.com/InfoAgeTech/django-core/tarball/master
-https://github.com/InfoAgeTech/python-tools/tarball/master

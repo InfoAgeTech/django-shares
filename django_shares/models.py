@@ -1,14 +1,16 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
-from django_core.db.models.mixins.base import AbstractBaseModel
 from django_core.db.models import AbstractTokenModel
-from python_tools.list_utils import make_obj_list
+from django_core.db.models.mixins.base import AbstractBaseModel
+from django_core.utils.list_utils import make_obj_list
 
 from .constants import Status
 from .db.models import ShareManager
@@ -17,6 +19,7 @@ from .db.models import ShareManager
 User = get_user_model()
 
 
+@python_2_unicode_compatible
 class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     """Abstract Base share object represents basic shared information for a
     specific user sharing an object.
