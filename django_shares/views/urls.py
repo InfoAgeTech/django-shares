@@ -4,7 +4,8 @@ Module all about url shares based on url keyword arg.
 from __future__ import unicode_literals
 
 from django.views.generic.edit import DeleteView
-from django_shares.mixins.forms import SharedObjectRemoveShareForm
+
+from ..forms import SharedObjectRemoveShareForm
 
 
 class SharedObjectUrlShareViewMixin(object):
