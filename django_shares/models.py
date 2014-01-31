@@ -68,9 +68,6 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return str(self.id)
-
     @classmethod
     def save_prep(cls, instance_or_instances):
         """Preprocess the object before the object is saved.  This
@@ -215,3 +212,6 @@ class Share(AbstractShare):
         # Make sure you can only have 1 share per user per shared_object
         unique_together = ('content_type', 'object_id', 'for_user',)
         index_together = [('content_type', 'object_id')]
+
+    def __str__(self):
+        return str(self.id)
