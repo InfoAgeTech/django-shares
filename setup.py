@@ -25,7 +25,7 @@ setup(
     author='Troy Grosfield',
     maintainer='Troy Grosfield',
     long_description=README,
-    url='https://github.com/InfoAgeTech/django-shares',
+    url='https://github.com/infoagetech/django-shares',
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
