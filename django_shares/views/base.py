@@ -24,4 +24,4 @@ class SharedObjectViewMixin(object):
         """Get the object that's being shared.  This can be overridden.
         Defaults to self.object.
         """
-        return self.shared_object
+        return self.shared_object or self.get_object()

@@ -1,16 +1,35 @@
 from __future__ import unicode_literals
 
 from ..constants import Status
-from ..utils import get_share_for_user
 from ..utils import sort_shares_by_status
 
 
-class SharedObjectSharesViewMixin(object):
+class SharedObjectUserShareViewMixin(object):
+    """View mixin for the auth user's object share. The shared object is
+    assumed to be the object returned from `get_object` call from anything that
+    subclasses django.views.generic.detail.SingleObjectMixin
+    """
+    shared_object_user_share = None  # auth user's share for this object
+
+    def dispatch(self, *args, **kwargs):
+        user_share = self.get_shared_object().shares.get_for_user(
+                                                            self.request.user)
+        self.shared_object_user_share = user_share
+        return super(SharedObjectUserShareViewMixin,
+                     self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SharedObjectUserShareViewMixin,
+                        self).get_context_data(**kwargs)
+        context['shared_object_user_share'] = self.shared_object_user_share
+        return context
+
+
+class SharedObjectSharesViewMixin(SharedObjectUserShareViewMixin):
     """View mixin for a shared object.  The shared object is assumed to be
     the object returned from `get_object` call from anything that subclasses
     django.views.generic.detail.SingleObjectMixin
     """
-    shared_object_user_share = None  # auth user's share for this object
     shared_object_shares_accepted = None
     shared_object_shares_pending = None
     shared_object_shares_declined = None
@@ -26,7 +45,6 @@ class SharedObjectSharesViewMixin(object):
     def get_context_data(self, **kwargs):
         context = super(SharedObjectSharesViewMixin,
                         self).get_context_data(**kwargs)
-        context['shared_object_user_share'] = self.shared_object_user_share
 
         for status in Status.get_keys():
             attr_name = u'shared_object_shares_{0}'.format(status.lower())
@@ -89,10 +107,6 @@ class SharedObjectSharesViewMixin(object):
                                                    'shared_object')
 
         shares_by_status = sort_shares_by_status(shares=shares)
-        setattr(self,
-                u'{0}_user_share'.format(attr_prefix),
-                get_share_for_user(shares=shares,
-                                   user=self.request.user))
 
         for status in Status.get_keys():
             attr_name = u'{0}_shares_{1}'.format(attr_prefix, status.lower())
