@@ -75,6 +75,45 @@ class ShareManager(CommonManager, TokenManager):
                            status=status,
                            **kwargs)
 
+    def create_many(self, objs, for_user, created_user, status=Status.PENDING,
+                    **kwargs):
+        """Creates many shares at once of the same object type.  This is
+        different from ``bulk_create`` because this can create many shares
+        from many different objects of the same content type. For example,
+
+        >> obj_1 = SomeObject.objects.create(...)
+        >> obj_2 = SomeObject.objects.create(...)
+        >> obj_3 = SomeObject.objects.create(...)
+        >> objs = [obj_1, obj_2, obj_3]
+        >> # This creates 3 shares (obj_1, obj_2, obj_3) for "some_user" that
+        >> # all have the same attributes (i.e. status=Status.ACCEPTED).
+        >> ShareManager.objects.create_many(objs=objs,
+        ..                                  for_user=some_user,
+        ..                                  status=Status.ACCEPTED)
+
+        Under the covers this method calls ``bulk_create``.
+
+        This should be called from a class and not a class instance.
+
+        :param objs: iterable of objects to create shares for
+        :param for_user: the user the shares are for
+        :param created_user: the users creating all the shares
+        """
+        if not objs:
+            return
+
+        shares = [self.model(for_user=for_user,
+                             shared_object=obj,
+                             status=status,
+                             created_user=created_user,
+                             **kwargs) for obj in objs]
+
+        self.model.save_prep(shares)
+        # Don't want to call self.bulk_create here because I don't want the
+        # instance associated with the shares since it will be different for
+        # each share.
+        return super(ShareManager, self).bulk_create(objs=shares, **kwargs)
+
     def bulk_create(self, shares, *args, **kwargs):
         """Bulk create's shares for object.
 
@@ -82,7 +121,12 @@ class ShareManager(CommonManager, TokenManager):
         object when this method is called from an instance of a class.  So, if
         a share is for a user who already has a share to the shared object,
         that share will not be added in the bulk_create.
+
+        :param shares: iterable of share objects.
         """
+        if not shares:
+            return
+
         if hasattr(self, 'instance') and hasattr(self.instance, 'shares'):
             current_share_users = [s.for_user
                                    for s in self.instance.shares.all()
@@ -91,8 +135,7 @@ class ShareManager(CommonManager, TokenManager):
                       if s.for_user not in current_share_users]
 
             for share in shares:
-                # TODO: does this need to check for type?  Can 'instance' be a
-                #       BillShare object instead of a Bill object?  Is this the
+                # TODO: does this need to check for type?  Is this the
                 #       correct behavior?
                 if not share.shared_object:
                     share.shared_object = self.instance

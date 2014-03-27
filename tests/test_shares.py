@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.auth import get_user_model
 from django_shares.constants import Status
 from django_shares.models import Share
 from django_testing.testcases.users import SingleUserTestCase
 from django_testing.user_utils import create_user
+from tests.test_models.models import TestSharedObjectModel
 
 
 User = get_user_model()
@@ -190,3 +192,26 @@ class ShareTests(SingleUserTestCase):
         last_name = 'Doe'
         share = Share(last_name=last_name)
         self.assertEqual(share.get_last_name(), last_name)
+
+    def test_create_many(self):
+        """Test for creating many objects at once.  This is different from
+        bulk_create.  See ``create_many`` doc.
+        """
+        user = create_user()
+        obj_1 = TestSharedObjectModel.objects.create()
+        obj_2 = TestSharedObjectModel.objects.create()
+        obj_3 = TestSharedObjectModel.objects.create()
+        objs = [obj_1, obj_2, obj_3]
+        # There shouldn't be any shares here.
+        self.assertEqual(obj_1.shares.count(), 0)
+        self.assertEqual(obj_2.shares.count(), 0)
+        self.assertEqual(obj_3.shares.count(), 0)
+
+        ShareClass = TestSharedObjectModel.get_share_class()
+        shares = ShareClass.objects.create_many(objs=objs,
+                                                for_user=user,
+                                                created_user=user,
+                                                status=Status.ACCEPTED)
+        self.assertEqual(obj_1.shares.count(), 1)
+        self.assertEqual(obj_2.shares.count(), 1)
+        self.assertEqual(obj_3.shares.count(), 1)

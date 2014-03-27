@@ -32,9 +32,10 @@ class AbstractSharedObjectModelMixin(models.Model):
                         '    shares = generic.GenericRelation(Share)'.format(
                                                              self.__class__))
 
-    def get_share_class(self):
+    @classmethod
+    def get_share_class(cls):
         """Gets the class instance associated to the "shares" model field."""
-        return self.shares.model
+        return cls().shares.model
 
 
 class SafeDeleteShareModelMixin(models.Model):
