@@ -24,7 +24,6 @@ class ShareTests(SingleUserTestCase):
 
     def test_add_for_user(self):
         """Share a user object with a another user."""
-        # self.assertEqual(self.car.shares, [])
         share = Share.objects.create_for_user(created_user=self.user,
                                               for_user=self.user,
                                               shared_object=self.shared_user)
