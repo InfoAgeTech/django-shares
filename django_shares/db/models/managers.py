@@ -95,18 +95,32 @@ class ShareManager(CommonManager, TokenManager):
 
         This should be called from a class and not a class instance.
 
-        :param objs: iterable of objects to create shares for
+        This method protects against duplicate shares for a single user.
+        If a user is already sharing an object and another share for the same
+        user is passed in ``obj``, no new share will be created.
+
+        :param objs: iterable of objects to create shares for.  These objects
+            MUST all be for the same object type!
         :param for_user: the user the shares are for
         :param created_user: the users creating all the shares
         """
         if not objs:
             return
 
+        obj_ids = [obj.id for obj in objs]
+        content_type = ContentType.objects.get_for_model(objs[0])
+        current_obj_user_shares = self.model.objects.filter(
+            for_user=for_user,
+            object_id__in=obj_ids,
+            content_type=content_type
+        ).values_list('id', flat=True)
+
         shares = [self.model(for_user=for_user,
                              shared_object=obj,
                              status=status,
                              created_user=created_user,
-                             **kwargs) for obj in objs]
+                             **kwargs)
+                  for obj in objs if obj.id not in current_obj_user_shares]
 
         self.model.save_prep(shares)
         # Don't want to call self.bulk_create here because I don't want the

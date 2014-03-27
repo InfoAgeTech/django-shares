@@ -214,3 +214,27 @@ class ShareTests(SingleUserTestCase):
         self.assertEqual(obj_1.shares.count(), 1)
         self.assertEqual(obj_2.shares.count(), 1)
         self.assertEqual(obj_3.shares.count(), 1)
+
+    def test_create_many_prevent_duplicate_share(self):
+        """Test the ``create_many`` method that ensure no duplicate shares are
+        created for a single user.
+        """
+        user = create_user()
+        obj_1 = TestSharedObjectModel.objects.create()
+        obj_1.shares.create_for_user(for_user=user,
+                                     created_user=user,
+                                     status=Status.ACCEPTED)
+        self.assertEqual(obj_1.shares.count(), 1)
+
+        obj_2 = TestSharedObjectModel.objects.create()
+        obj_3 = TestSharedObjectModel.objects.create()
+        objs = [obj_1, obj_2, obj_3]
+
+        ShareClass = TestSharedObjectModel.get_share_class()
+        shares = ShareClass.objects.create_many(objs=objs,
+                                                for_user=user,
+                                                created_user=user,
+                                                status=Status.ACCEPTED)
+        self.assertEqual(obj_1.shares.count(), 1)
+        self.assertEqual(obj_2.shares.count(), 1)
+        self.assertEqual(obj_3.shares.count(), 1)
