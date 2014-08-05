@@ -12,9 +12,12 @@ class SharedObjectUserShareViewMixin(object):
     shared_object_user_share = None  # auth user's share for this object
 
     def dispatch(self, *args, **kwargs):
-        user_share = self.get_shared_object().shares.get_for_user(
-                                                            self.request.user)
-        self.shared_object_user_share = user_share
+        if self.request.user.is_authenticated():
+            user_share = self.get_shared_object().shares.get_for_user(
+                self.request.user
+            )
+            self.shared_object_user_share = user_share
+
         return super(SharedObjectUserShareViewMixin,
                      self).dispatch(*args, **kwargs)
 

@@ -159,6 +159,9 @@ class ShareManager(CommonManager, TokenManager):
 
     def get_for_user(self, user, **kwargs):
         """Gets a shared objects for user."""
+        if not user.is_authenticated():
+            return None
+
         # TODO: could optimize this to first look and see if the shares have
         #       already been prefetched.  If so, do the loop, it not don't make
         #       the call to pull back all the shares.
