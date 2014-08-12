@@ -16,6 +16,6 @@ install:
   - python setup.py -q install
 # command to run tests
 script:
-  - coverage run tests/manage.py test
+  - cd tests && coverage run manage.py test
 after_success: 
-  - coveralls
+  - coveralls --rcfile=../.coveragerc
