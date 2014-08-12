@@ -32,7 +32,7 @@ class SharedObjectUrlShareViewMixin(object):
         return context
 
     def get_url_share(self, **kwargs):
-        if self.url_share == None:
+        if self.url_share is None:
             self.url_share = self.get_shared_object().shares.get_by_token_or_404(
                                         token=kwargs.get(self.token_url_kwarg))
 
