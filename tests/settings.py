@@ -34,6 +34,13 @@ INSTALLED_APPS = (
     'test_models',
 )
 
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+)
+
 # Added in django 1.5 secret key is required.  This is a random generated string
 SECRET_KEY = '12345abcd'
 

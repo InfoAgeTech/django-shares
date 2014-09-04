@@ -1,14 +1,11 @@
 from __future__ import unicode_literals
 
-from django.contrib.auth import get_user_model
 from django_shares.constants import Status
 from django_shares.models import Share
 from django_testing.testcases.users import SingleUserTestCase
 from django_testing.user_utils import create_user
-from tests.test_models.models import TestSharedObjectModel
 
-
-User = get_user_model()
+from test_models.models import TestSharedObjectModel
 
 
 class ShareTests(SingleUserTestCase):

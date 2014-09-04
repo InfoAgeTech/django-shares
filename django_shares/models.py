@@ -14,9 +14,8 @@ from django_core.utils.list_utils import make_obj_list
 
 from .constants import Status
 from .db.models import ShareManager
+from django.conf import settings
 
-
-User = get_user_model()
 
 
 class AbstractShare(AbstractTokenModel, AbstractBaseModel):
@@ -45,7 +44,7 @@ class AbstractShare(AbstractTokenModel, AbstractBaseModel):
     * token: unique share token.
 
     """
-    for_user = models.ForeignKey(User,
+    for_user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                  blank=True,
                                  null=True,
                                  related_name='for_user+')
