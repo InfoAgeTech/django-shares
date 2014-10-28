@@ -10,6 +10,7 @@ from ...constants import Status
 
 
 class ShareManager(CommonManager, TokenManager):
+
     """Manager for the object share. This manager is used for the share
     object (model) that either extends Share or implements AbstractShare.
     """
@@ -40,7 +41,8 @@ class ShareManager(CommonManager, TokenManager):
                        'status': status})
 
         if not content_type:
-            content_type = ContentType.objects.get_for_model(model=shared_object)
+            content_type = ContentType.objects.get_for_model(
+                model=shared_object)
 
         return self.get_or_create(for_user=for_user,
                                   content_type=content_type,
@@ -113,7 +115,7 @@ class ShareManager(CommonManager, TokenManager):
             for_user=for_user,
             object_id__in=obj_ids,
             content_type=content_type
-        ).values_list('id', flat=True)
+        ).values_list('object_id', flat=True)
 
         shares = [self.model(for_user=for_user,
                              shared_object=obj,
@@ -213,6 +215,7 @@ class ShareManager(CommonManager, TokenManager):
 
 
 class SharedObjectManager(BaseManager):
+
     """Manager for the object being shared.  This likely means you have some
     type of relation to shared objects.  The models will likely have something
     like:
