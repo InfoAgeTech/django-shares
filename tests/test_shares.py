@@ -6,7 +6,7 @@ from django_testing.testcases.users import SingleUserTestCase
 from django_testing.user_utils import create_user
 
 from test_models.models import TestSharedObjectModel
-from tests.test_models.models import TestSharedObjectModel2
+from test_models.models import TestSharedObjectModel2
 
 
 class ShareTests(SingleUserTestCase):
