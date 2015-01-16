@@ -6,6 +6,7 @@ from django_testing.testcases.users import SingleUserTestCase
 from django_testing.user_utils import create_user
 
 from test_models.models import TestSharedObjectModel
+from tests.test_models.models import TestSharedObjectModel2
 
 
 class ShareTests(SingleUserTestCase):
@@ -99,6 +100,52 @@ class ShareTests(SingleUserTestCase):
 
         self.assertEqual(len(shares), 1)
         self.assertEqual(shares[0], share)
+
+    def test_get_by_shared_objects(self):
+        """Get shares for a shared objects."""
+        obj_1 = TestSharedObjectModel.objects.create()
+        obj_2 = TestSharedObjectModel2.objects.create()
+
+        user_2 = create_user()
+
+        share_user_1_obj_1 = Share.objects.create_for_user(
+            created_user=self.user,
+            for_user=self.user,
+            shared_object=obj_1
+        )
+        share_user_1_obj_2 = Share.objects.create_for_user(
+            created_user=self.user,
+            for_user=self.user,
+            shared_object=obj_2
+        )
+
+        share_user_2_obj_1 = Share.objects.create_for_user(
+            created_user=user_2,
+            for_user=user_2,
+            shared_object=obj_1
+        )
+        share_user_2_obj_2 = Share.objects.create_for_user(
+            created_user=user_2,
+            for_user=user_2,
+            shared_object=obj_2
+        )
+
+        shares = list(Share.objects.get_by_shared_objects(objs=[obj_1, obj_2]))
+
+        self.assertEqual(len(shares), 4)
+        self.assertTrue(share_user_1_obj_1 in shares)
+        self.assertTrue(share_user_1_obj_2 in shares)
+        self.assertTrue(share_user_2_obj_1 in shares)
+        self.assertTrue(share_user_2_obj_2 in shares)
+
+        shares = Share.objects.get_by_shared_objects(
+            objs=[obj_1, obj_2],
+            for_user=user_2
+        )
+
+        self.assertEqual(len(shares), 2)
+        self.assertTrue(share_user_2_obj_1 in shares)
+        self.assertTrue(share_user_2_obj_2 in shares)
 
     def test_accept_share(self):
         """Test for accepting share."""

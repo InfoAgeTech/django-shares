@@ -213,6 +213,39 @@ class ShareManager(CommonManager, TokenManager):
         return self.filter(content_type=content_type, object_id=obj.id,
                            **kwargs)
 
+    def get_by_shared_objects(self, objs, for_user=None, **kwargs):
+        """Gets all shares for an iterable of shared objects.
+
+        :param objs: a list or other iterable of objects to get the shares for.
+        :param for_user: the user to get the shares for.  If None, it will
+            return all shares.
+        """
+        obj_models = set([])
+        # gets a dict of obj ids keyed by model {model: [123, 234, 345]}
+        obj_ids_by_model = {}
+
+        for obj in objs:
+            model_cls = obj.__class__
+            obj_models.add(model_cls)
+
+            if model_cls not in obj_ids_by_model:
+                obj_ids_by_model[model_cls] = []
+
+            obj_ids_by_model[model_cls].append(obj.id)
+
+        # get content types by models {model: content_type}
+        content_types_by_model = ContentType.objects.get_for_models(*obj_models)
+
+        q = None
+
+        for obj_model, content_type in content_types_by_model.items():
+            obj_ids = obj_ids_by_model[obj_model]
+            new_query = (Q(content_type=content_type) &
+                         Q(object_id__in=obj_ids))
+            q = new_query if q is None else q | new_query
+
+        return self.filter(q, **kwargs)
+
 
 class SharedObjectManager(BaseManager):
 
